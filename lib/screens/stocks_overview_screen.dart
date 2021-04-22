@@ -34,7 +34,6 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
 
   Future<void> _refreshStocks(BuildContext context) async {
     await Provider.of<Stocks>(context, listen: false).fetchCurrentPrices();
-    setState(() {});
   }
 
   @override
@@ -49,6 +48,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
           IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
+                _isInit = true;//reset to re-fetch the prices
                 Navigator.of(context).pushNamed(AddStockScreen.routeName);
               })
         ],

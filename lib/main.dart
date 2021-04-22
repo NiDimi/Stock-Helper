@@ -57,16 +57,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         AddStockScreen.routeName: (_) => AddStockScreen(),
       },
-      // Scaffold(
-      //   body: Column(children: [
-      //     Text(_test5),
-      //     OutlinedButton(
-      //       onPressed: test,
-      //       child: Text('testtt'),
-      //       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
-      //     )
-      //   ], mainAxisAlignment: MainAxisAlignment.spaceAround ,),
-      // ),
     ),);
   }
 }

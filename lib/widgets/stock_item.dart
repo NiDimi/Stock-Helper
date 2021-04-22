@@ -37,7 +37,7 @@ class StockItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    (_stock.currentPrice * _stock.quantity).toString(),
+                    (_stock.currentPrice * _stock.quantity).toStringAsFixed(2),
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   Container(
@@ -46,7 +46,7 @@ class StockItem extends StatelessWidget {
                         color: percentage.contains("+") ? Colors.green : Colors.red,
                         borderRadius: BorderRadius.all(Radius.circular(5))),
                     height: 30,
-                    width: 70,
+                    width: 80,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(

@@ -49,6 +49,7 @@ class Stocks with ChangeNotifier {
       _stocks[i].currentPrice = stockData[i]["regularMarketPrice"];
       _stocks[i].name = stockData[i]["longName"];
     }
+    notifyListeners();
   }
 
   String getTickersString() {
@@ -64,22 +65,46 @@ class Stocks with ChangeNotifier {
     String percentage = "";
     if (stock.price > stock.currentPrice) {
       percentage += "-";
-      double difference = (stock.price - stock.currentPrice)/stock.currentPrice*100;
+      double difference = (stock.price - stock.currentPrice) /
+          stock.currentPrice * 100;
       percentage += difference.toStringAsFixed(2);
     } else {
       percentage += "+";
-      double difference = (stock.currentPrice - stock.price)/stock.price*100;
+      double difference = (stock.currentPrice - stock.price) / stock.price *
+          100;
       percentage += difference.toStringAsFixed(2);
     }
     percentage += "%";
     return percentage;
   }
 
-  double getRevenue(){
+  double getRevenue() {
     double total = 0;
     _stocks.forEach((stock) {
       total += (stock.currentPrice - stock.price) * stock.quantity;
     });
     return total;
+  }
+
+  void addStock(Stock stock) {
+    _stocks.add(stock);
+    notifyListeners();
+  }
+
+  Future<bool> checkIfStockExists(String ticker) async {
+    var response = await http.get(
+      Uri.parse(
+          "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=$ticker&region=US"),
+      headers: headers,
+    );
+    //sometimes we get data for stocks that dont have a price we need to check the price, we need to check the price
+    //if the code fails it means that it is an invalid ticker
+    try {
+      final extractedData = await jsonDecode(response.body);
+      double price = extractedData['price']['regularMarketPrice']['raw'];
+      return price > 0;
+    } catch(e){
+      return false;
+    }
   }
 }
