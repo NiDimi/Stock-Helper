@@ -47,7 +47,7 @@ class Stocks with ChangeNotifier {
     List<dynamic> stockData = extractedData["quoteResponse"]["result"];
     for (int i = 0; i < stockData.length; i++) {
       _stocks[i].currentPrice = stockData[i]["regularMarketPrice"];
-      _stocks[i].name = stockData[i]["longName"];
+      _stocks[i].name = stockData[i]["shortName"];
     }
     notifyListeners();
   }
