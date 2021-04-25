@@ -45,8 +45,8 @@ class _AddStockScreenState extends State<AddStockScreen> {
       _isLoading = true;
     });
     final stocksData = Provider.of<Stocks>(context, listen: false);
-    bool stockExists = await stocksData.checkIfStockExists(_stock.ticker);
-    if (!stockExists) {
+    _stock = await stocksData.checkIfStockExists(_stock);
+    if (_stock == null) {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -67,7 +67,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
         _isLoading = false;
       });
     }
-    if (stockExists) {
+    if (_stock != null) {
       stocksData.addStock(_stock);
       Navigator.of(context).pop();
     }

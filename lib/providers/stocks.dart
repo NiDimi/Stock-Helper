@@ -3,27 +3,36 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:stock_helper/models/stock.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class Stocks with ChangeNotifier {
   static List<Stock> _stocks = [
     Stock(
-      ticker: 'GOOG',
+      id: Uuid().v1(),
+      name: 'Google',
+      ticker: 'ker.pa',
       price: 2294.63,
       quantity: 1,
     ),
     Stock(
+      id: Uuid().v1(),
+      name: 'Microsoft',
       ticker: 'MSFT',
       price: 258.24,
       quantity: 2,
     ),
     Stock(
+      id: Uuid().v1(),
+      name: 'Facebook',
       ticker: 'FB',
       price: 301.55,
       quantity: 1,
     ),
     Stock(
-      ticker: 'KER.PA',
-      price: 640.20,
+      id: Uuid().v1(),
+      name: 'Apple',
+      ticker: 'aapl',
+      price: 640,
       quantity: 1,
     )
   ];
@@ -32,32 +41,68 @@ class Stocks with ChangeNotifier {
     return [..._stocks];
   }
 
-  var headers = {
+  final yahooHeaders = {
     'x-rapidapi-key': 'b8be287101msh595fa7833446797p1de827jsn3ba41daea700',
     'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+  };
+
+  final twelveHeaders = {
+    'x-rapidapi-key': 'b8be287101msh595fa7833446797p1de827jsn3ba41daea700',
+    'x-rapidapi-host': 'twelve-data1.p.rapidapi.com'
   };
 
   Future<void> fetchCurrentPrices() async {
     var response = await http.get(
       Uri.parse(
-          "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=${getTickersString()}"),
-      headers: headers,
+          "https://twelve-data1.p.rapidapi.com/price?symbol=${getTickersStringTwelve(_stocks)}&format=json&outputsize=30"),
+      headers: twelveHeaders,
     );
-    final extractedData = await jsonDecode(response.body);
-    List<dynamic> stockData = extractedData["quoteResponse"]["result"];
-    for (int i = 0; i < stockData.length; i++) {
-      _stocks[i].currentPrice = stockData[i]["regularMarketPrice"];
-      _stocks[i].name = stockData[i]["shortName"];
+    List<Stock> failedStocks = [];
+
+    Map<String, dynamic> extractedData = await jsonDecode(response.body);
+
+    for (int i = 0; i < _stocks.length; i++) {
+      try {
+        _stocks[i].currentPrice =
+            double.parse(extractedData[_stocks[i].ticker]["price"]);
+      } catch (e) {
+        failedStocks.add(_stocks[i]);
+      }
+    }
+    if (failedStocks.length > 0) {
+      var response = await http.get(
+        Uri.parse(
+            "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=${getTickersStringYahoo(failedStocks)}"),
+        headers: yahooHeaders,
+      );
+      final extractedData = await jsonDecode(response.body);
+
+      List<dynamic> stockData = extractedData["quoteResponse"]["result"];
+      for (int i = 0; i < stockData.length; i++) {
+        Stock stock = findStockById(failedStocks[i].id);
+        if(stock != null){
+          stock.currentPrice = stockData[i]["regularMarketPrice"];
+        }
+      }
     }
     notifyListeners();
   }
 
-  String getTickersString() {
+  String getTickersStringTwelve(List<Stock> stocks) {
     String tickerString = "";
-    for (int i = 0; i < _stocks.length - 1; i++) {
+    for (int i = 0; i < stocks.length - 1; i++) {
+      tickerString += "${stocks[i].ticker}%2C%20";
+    }
+    tickerString += "${stocks[stocks.length - 1].ticker}";
+    return tickerString;
+  }
+
+  String getTickersStringYahoo(List<Stock> stocks) {
+    String tickerString = "";
+    for (int i = 0; i < stocks.length - 1; i++) {
       tickerString += "${_stocks[i].ticker}%2C";
     }
-    tickerString += "${_stocks[_stocks.length - 1].ticker}";
+    tickerString += "${stocks[stocks.length - 1].ticker}";
     return tickerString;
   }
 
@@ -65,13 +110,13 @@ class Stocks with ChangeNotifier {
     String percentage = "";
     if (stock.price > stock.currentPrice) {
       percentage += "-";
-      double difference = (stock.price - stock.currentPrice) /
-          stock.currentPrice * 100;
+      double difference =
+          (stock.price - stock.currentPrice) / stock.currentPrice * 100;
       percentage += difference.toStringAsFixed(2);
     } else {
       percentage += "+";
-      double difference = (stock.currentPrice - stock.price) / stock.price *
-          100;
+      double difference =
+          (stock.currentPrice - stock.price) / stock.price * 100;
       percentage += difference.toStringAsFixed(2);
     }
     percentage += "%";
@@ -91,20 +136,38 @@ class Stocks with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> checkIfStockExists(String ticker) async {
+  Future<Stock> checkIfStockExists(Stock stock) async {
     var response = await http.get(
       Uri.parse(
-          "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=$ticker&region=US"),
-      headers: headers,
+          "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${stock.ticker}&region=US"),
+      headers: yahooHeaders,
     );
     //sometimes we get data for stocks that dont have a price we need to check the price, we need to check the price
     //if the code fails it means that it is an invalid ticker
     try {
       final extractedData = await jsonDecode(response.body);
       double price = extractedData['price']['regularMarketPrice']['raw'];
-      return price > 0;
-    } catch(e){
-      return false;
+      if (price > 0) {
+        return new Stock(
+          id: Uuid().v1(),
+          name: extractedData['price']['shortName'],
+          ticker: stock.ticker,
+          price: stock.price,
+          quantity: stock.quantity,
+        );
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
+  }
+
+  Stock findStockById(String id){
+    for (int i = 0; i <_stocks.length;i++){
+      if(_stocks[i].id == id){
+        return _stocks[i];
+      }
+    }
+    return null;
   }
 }
