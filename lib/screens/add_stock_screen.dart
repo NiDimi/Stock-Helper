@@ -119,7 +119,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
                           quantity: _stock.quantity);
                     },
                   ),
-                  Divider(
+                  SizedBox(
                     height: 20,
                   ),
                   TextFormField(
@@ -150,7 +150,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
                           quantity: _stock.quantity);
                     },
                   ),
-                  Divider(
+                  SizedBox(
                     height: 20,
                   ),
                   TextFormField(
@@ -181,8 +181,8 @@ class _AddStockScreenState extends State<AddStockScreen> {
                           quantity: int.parse(quantity));
                     },
                   ),
-                  Divider(
-                    height: 20,
+                  SizedBox(
+                    height: 40,
                   ),
                   ElevatedButton(
                     onPressed: _submitForm,
