@@ -53,7 +53,7 @@ class Stocks with ChangeNotifier {
   };
 
   //featch the current prices of the stocks in the list
-  Future<void> fetchCurrentPrices() async {
+  Future<void> fetchCurrentPrices(bool needNotify) async {
     //since we dont want to pay money we need to use 2 apis to get the prices
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
@@ -91,7 +91,9 @@ class Stocks with ChangeNotifier {
         }
       }
     }
-    notifyListeners();
+    if(needNotify){
+      notifyListeners();
+    }
   }
 
   //get the ticker string passed in the url in the format twelve api wants it
@@ -176,11 +178,12 @@ class Stocks with ChangeNotifier {
 
   //find a stock in the list using its id
   Stock findStockById(String id){
-    for (int i = 0; i <_stocks.length;i++){
-      if(_stocks[i].id == id){
-        return _stocks[i];
-      }
-    }
-    return null;
+    return _stocks.firstWhere((prod) => prod.id == id);
+  }
+
+  void removeStock(String id){
+    int stockIndex = _stocks.indexWhere((stock) => stock.id == id);
+    _stocks.removeAt(stockIndex);
+    notifyListeners();
   }
 }

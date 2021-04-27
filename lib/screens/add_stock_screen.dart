@@ -14,8 +14,21 @@ class _AddStockScreenState extends State<AddStockScreen> {
   final _form = GlobalKey<FormState>();
   final _priceFocusNode = FocusNode();
   final _quantityFocusNode = FocusNode();
-  var _stock = Stock(price: 0, quantity: 0, ticker: "");
+  var _stock = Stock(price: 0, quantity: 0, ticker: '');
   var _isLoading = false;
+  var _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      Stock prevStock = ModalRoute.of(context).settings.arguments as Stock;
+      if (prevStock != null) {
+        _stock = prevStock;
+      }
+    }
+    _isInit = false;
+  }
 
   @override
   void dispose() {
@@ -38,40 +51,48 @@ class _AddStockScreenState extends State<AddStockScreen> {
 
   //Function for submitting the from
   Future<void> _submitForm() async {
-    final isValid = _form.currentState.validate();//validate the input
+    final isValid = _form.currentState.validate(); //validate the input
     if (!isValid) {
-      return;//if it fails return
+      return; //if it fails return
     }
     _form.currentState.save();
     setState(() {
-      _isLoading = true;//loading because we need to wait to check if the stock exists
+      _isLoading =
+          true; //loading because we need to wait to check if the stock exists
     });
     final stocksData = Provider.of<Stocks>(context, listen: false);
-    _stock = await stocksData.checkIfStockExists(_stock);
-    if (_stock == null) {//if the stock doesnt exist display a dialog informing the user
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Invalid Ticker'),
-          content: Text(
-              'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Okay'),
-            )
-          ],
-        ),
-      );
-      setState(() {
-        _isLoading = false;
-      });
+    if (_stock.id != null) {
+      stocksData.removeStock(_stock.id);
+    } else {
+      _stock = await stocksData.checkIfStockExists(_stock);
+      if (_stock == null) {
+        _stock =
+            Stock(price: 0, quantity: 0, ticker: ''); //reset it to the start
+        //if the stock doesnt exist display a dialog informing the user
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Invalid Ticker'),
+            content: Text(
+                'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Okay'),
+              )
+            ],
+          ),
+        );
+      }
     }
-    if (_stock != null) {//if the stock exists add the stock in the list and go back
+    setState(() {
+      _isLoading = false;
+    });
+    if (_stock != null) {
+      //if the stock exists add the stock in the list and go back
       stocksData.addStock(_stock);
-      Navigator.of(context).pop();
     }
   }
 
@@ -83,24 +104,28 @@ class _AddStockScreenState extends State<AddStockScreen> {
       ),
       body: _isLoading
           ? Center(
-            child: Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   CircularProgressIndicator(),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Text(
                     'Validating data',
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                 ],
               ),
-          )
+            )
           : Form(
               key: _form,
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 children: <Widget>[
-                  TextFormField(//Text field for the ticker
+                  TextFormField(
+                    //Text field for the ticker
+                    initialValue: _stock.ticker,
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.name,
                     decoration: textInputDecoration('Ticker'),
@@ -116,6 +141,8 @@ class _AddStockScreenState extends State<AddStockScreen> {
                     },
                     onSaved: (ticker) {
                       _stock = Stock(
+                          id: _stock.id,
+                          name: _stock.name,
                           ticker: ticker.toUpperCase(),
                           price: _stock.price,
                           quantity: _stock.quantity);
@@ -124,7 +151,10 @@ class _AddStockScreenState extends State<AddStockScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(//Text field for the price
+                  TextFormField(
+                    //Text field for the price
+                    initialValue:
+                        _stock.price > 0 ? _stock.price.toString() : '',
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.number,
                     decoration: textInputDecoration('Price'),
@@ -135,18 +165,20 @@ class _AddStockScreenState extends State<AddStockScreen> {
                     },
                     validator: (price) {
                       if (price.isEmpty) {
-                        return "PLease enter a price";
+                        return 'PLease enter a price';
                       }
                       if (double.parse(price) == null) {
-                        return "Please enter a valid number";
+                        return 'Please enter a valid number';
                       }
                       if (double.parse(price) <= 0) {
-                        return "Please enter a number greater than zero";
+                        return 'Please enter a number greater than zero';
                       }
                       return null;
                     },
                     onSaved: (price) {
                       _stock = Stock(
+                          id: _stock.id,
+                          name: _stock.name,
                           ticker: _stock.ticker,
                           price: double.parse(price),
                           quantity: _stock.quantity);
@@ -155,7 +187,10 @@ class _AddStockScreenState extends State<AddStockScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(//Text field for the quantity
+                  TextFormField(
+                    //Text field for the quantity
+                    initialValue:
+                        _stock.quantity > 0 ? _stock.quantity.toString() : "",
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.number,
                     decoration: textInputDecoration('Quantity'),
@@ -166,18 +201,20 @@ class _AddStockScreenState extends State<AddStockScreen> {
                     },
                     validator: (price) {
                       if (price.isEmpty) {
-                        return "PLease enter a quantity";
+                        return 'PLease enter a quantity';
                       }
                       if (double.parse(price) == null) {
-                        return "Please enter a valid number";
+                        return 'Please enter a valid number';
                       }
                       if (double.parse(price) <= 0) {
-                        return "Please enter a number greater than zero";
+                        return 'Please enter a number greater than zero';
                       }
                       return null;
                     },
                     onSaved: (quantity) {
                       _stock = Stock(
+                          id: _stock.id,
+                          name: _stock.name,
                           ticker: _stock.ticker,
                           price: _stock.price,
                           quantity: int.parse(quantity));

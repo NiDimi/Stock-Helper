@@ -12,31 +12,30 @@ class StocksOverviewScreen extends StatefulWidget {
 }
 
 class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
-  var _isInit = true;//is necessary to set up the loading spinner
-  var _isLoading = false;//if the page is currently loading, waiting for the apis to get the results
+  var _isInit = true; //is necessary to set up the loading spinner
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    //if we init set the state to loading, we need the api data
-    if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<Stocks>(context, listen: false)
-          .fetchCurrentPrices()
-          .then((_) {
-        setState(() {
-          _isLoading = false;//when we get them stop loading
-        });
-      });
-    }
-    _isInit = false;//set it back to false to load again if the dependencies change
+    // //if we init set the state to loading, we need the api data
+    // if (_isInit) {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
+    //   Provider.of<Stocks>(context, listen: false)
+    //       .fetchCurrentPrices()
+    //       .then((_) {
+    //     setState(() {
+    //       _isLoading = false; //when we get them stop loading
+    //     });
+    //   });
+    // }
+    // _isInit = false;
   }
 
   //function to re-fetch the stocks
   Future<void> _refreshStocks(BuildContext context) async {
-    await Provider.of<Stocks>(context, listen: false).fetchCurrentPrices();
+    await Provider.of<Stocks>(context, listen: false).fetchCurrentPrices(true);
   }
 
   @override
@@ -50,16 +49,16 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
           IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                _isInit = true;//reset to re-fetch the prices
+                _isInit = true; //reset to re-fetch the prices
                 Navigator.of(context).pushNamed(AddStockScreen.routeName);
               })
         ],
       ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
+      body: FutureBuilder(
+        future: stocksData.fetchCurrentPrices(false),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return RefreshIndicator(
               backgroundColor: Colors.white,
               color: Colors.black,
               onRefresh: () => _refreshStocks(context),
@@ -71,7 +70,13 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
                 ),
                 RevenueDisplay(stocksData: stocksData)
               ]),
-            ),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
@@ -93,16 +98,16 @@ class RevenueDisplay extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            stocksData.getRevenue() > 0 ? "Revenue:" : "Lost:",
-            style: stocksData.getRevenue() > 0
+            stocksData.getRevenue() >= 0 ? "Revenue:" : "Lost:",
+            style: stocksData.getRevenue() >= 0
                 ? Theme.of(context).textTheme.headline3
                 : Theme.of(context).textTheme.headline4,
           ),
           Text(
-            stocksData.getRevenue() > 0
+            stocksData.getRevenue() >= 0
                 ? "+${stocksData.getRevenue().toStringAsFixed(0)}"
                 : stocksData.getRevenue().toStringAsFixed(0),
-            style: stocksData.getRevenue() > 0
+            style: stocksData.getRevenue() >= 0
                 ? Theme.of(context).textTheme.headline3
                 : Theme.of(context).textTheme.headline4,
           )
@@ -127,6 +132,7 @@ class StocksDisplay extends StatelessWidget {
       padding: EdgeInsets.only(top: 10),
       height: 550, //use the screen size
       child: ListView.builder(
+        shrinkWrap: true,
         itemBuilder: (_, index) => Column(
           children: [
             StockItem(stocksData.stocks[index]),
