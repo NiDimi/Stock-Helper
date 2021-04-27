@@ -5,12 +5,13 @@ import 'package:stock_helper/models/stock.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
+//helper class for the processing the stocks list
 class Stocks with ChangeNotifier {
   static List<Stock> _stocks = [
     Stock(
       id: Uuid().v1(),
       name: 'Google',
-      ticker: 'ker.pa',
+      ticker: 'GOOG',
       price: 2294.63,
       quantity: 1,
     ),
@@ -31,8 +32,8 @@ class Stocks with ChangeNotifier {
     Stock(
       id: Uuid().v1(),
       name: 'Apple',
-      ticker: 'aapl',
-      price: 640,
+      ticker: 'AAPl',
+      price: 130.2,
       quantity: 1,
     )
   ];
@@ -51,13 +52,17 @@ class Stocks with ChangeNotifier {
     'x-rapidapi-host': 'twelve-data1.p.rapidapi.com'
   };
 
+  //featch the current prices of the stocks in the list
   Future<void> fetchCurrentPrices() async {
+    //since we dont want to pay money we need to use 2 apis to get the prices
+    //twelve api has 12 calls per min and 850 per day
+    //yahoo has 500 per month
     var response = await http.get(
       Uri.parse(
           "https://twelve-data1.p.rapidapi.com/price?symbol=${getTickersStringTwelve(_stocks)}&format=json&outputsize=30"),
       headers: twelveHeaders,
     );
-    List<Stock> failedStocks = [];
+    List<Stock> failedStocks = [];//list because twelve api may fail with some stocks, and we will try with the yahoo if it fails
 
     Map<String, dynamic> extractedData = await jsonDecode(response.body);
 
@@ -69,6 +74,7 @@ class Stocks with ChangeNotifier {
         failedStocks.add(_stocks[i]);
       }
     }
+    //if a stock fails try with the yahoo api instead
     if (failedStocks.length > 0) {
       var response = await http.get(
         Uri.parse(
@@ -88,6 +94,7 @@ class Stocks with ChangeNotifier {
     notifyListeners();
   }
 
+  //get the ticker string passed in the url in the format twelve api wants it
   String getTickersStringTwelve(List<Stock> stocks) {
     String tickerString = "";
     for (int i = 0; i < stocks.length - 1; i++) {
@@ -97,6 +104,7 @@ class Stocks with ChangeNotifier {
     return tickerString;
   }
 
+  //get the ticker string passed in the url in the format yahoo api wants it
   String getTickersStringYahoo(List<Stock> stocks) {
     String tickerString = "";
     for (int i = 0; i < stocks.length - 1; i++) {
@@ -106,6 +114,7 @@ class Stocks with ChangeNotifier {
     return tickerString;
   }
 
+  //get the percentage of the increase/decrease for the stock
   String getPercentage(Stock stock) {
     String percentage = "";
     if (stock.price > stock.currentPrice) {
@@ -123,6 +132,7 @@ class Stocks with ChangeNotifier {
     return percentage;
   }
 
+  //get the total revenue from the stocks
   double getRevenue() {
     double total = 0;
     _stocks.forEach((stock) {
@@ -131,6 +141,7 @@ class Stocks with ChangeNotifier {
     return total;
   }
 
+  //add a stock in the list
   void addStock(Stock stock) {
     _stocks.add(stock);
     notifyListeners();
@@ -162,6 +173,7 @@ class Stocks with ChangeNotifier {
     }
   }
 
+  //find a stock in the list using its id
   Stock findStockById(String id){
     for (int i = 0; i <_stocks.length;i++){
       if(_stocks[i].id == id){

@@ -24,6 +24,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
     _quantityFocusNode.dispose();
   }
 
+  //The decoration used for the inputs
   InputDecoration textInputDecoration(String title) {
     return InputDecoration(
       labelText: title,
@@ -35,18 +36,19 @@ class _AddStockScreenState extends State<AddStockScreen> {
     );
   }
 
+  //Function for submitting the from
   Future<void> _submitForm() async {
-    final isValid = _form.currentState.validate();
+    final isValid = _form.currentState.validate();//validate the input
     if (!isValid) {
-      return;
+      return;//if it fails return
     }
     _form.currentState.save();
     setState(() {
-      _isLoading = true;
+      _isLoading = true;//loading because we need to wait to check if the stock exists
     });
     final stocksData = Provider.of<Stocks>(context, listen: false);
     _stock = await stocksData.checkIfStockExists(_stock);
-    if (_stock == null) {
+    if (_stock == null) {//if the stock doesnt exist display a dialog informing the user
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -67,7 +69,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
         _isLoading = false;
       });
     }
-    if (_stock != null) {
+    if (_stock != null) {//if the stock exists add the stock in the list and go back
       stocksData.addStock(_stock);
       Navigator.of(context).pop();
     }
@@ -98,7 +100,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 children: <Widget>[
-                  TextFormField(
+                  TextFormField(//Text field for the ticker
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.name,
                     decoration: textInputDecoration('Ticker'),
@@ -122,7 +124,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
+                  TextFormField(//Text field for the price
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.number,
                     decoration: textInputDecoration('Price'),
@@ -153,7 +155,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
+                  TextFormField(//Text field for the quantity
                     style: TextStyle(color: Theme.of(context).accentColor),
                     keyboardType: TextInputType.number,
                     decoration: textInputDecoration('Quantity'),

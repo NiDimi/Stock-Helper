@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//model class for the stocks
 class Stock {
   final String id;
   final String name;
