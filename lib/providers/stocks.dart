@@ -147,6 +147,7 @@ class Stocks with ChangeNotifier {
     notifyListeners();
   }
 
+  //we check if a stock has a name since we also need the name, which means the stock exists
   Future<Stock> checkIfStockExists(Stock stock) async {
     var response = await http.get(
       Uri.parse(
