@@ -93,7 +93,107 @@ class _AddStockScreenState extends State<AddStockScreen> {
     if (_stock != null) {
       //if the stock exists add the stock in the list and go back
       stocksData.addStock(_stock);
+      Navigator.of(context).pop();
     }
+  }
+
+  //Text field for the ticker
+  Widget tickerTextField() {
+    return TextFormField(
+      initialValue: _stock.ticker,
+      enabled: _stock.name == null,
+      style: TextStyle(color: Theme.of(context).accentColor),
+      keyboardType: TextInputType.name,
+      decoration: textInputDecoration('Ticker'),
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).requestFocus(_priceFocusNode);
+      },
+      validator: (ticker) {
+        if (ticker.isEmpty) {
+          return 'Please provide a ticker';
+        }
+        return null;
+      },
+      onSaved: (ticker) {
+        _stock = Stock(
+            id: _stock.id,
+            name: _stock.name,
+            ticker: ticker.toUpperCase(),
+            price: _stock.price,
+            quantity: _stock.quantity);
+      },
+    );
+  }
+
+  //Text field for the price
+  Widget priceTextField() {
+    return TextFormField(
+      initialValue: _stock.price > 0 ? _stock.price.toString() : '',
+      style: TextStyle(color: Theme.of(context).accentColor),
+      keyboardType: TextInputType.number,
+      decoration: textInputDecoration('Price'),
+      textInputAction: TextInputAction.next,
+      focusNode: _priceFocusNode,
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).requestFocus(_quantityFocusNode);
+      },
+      validator: (price) {
+        if (price.isEmpty) {
+          return 'PLease enter a price';
+        }
+        if (double.parse(price) == null) {
+          return 'Please enter a valid number';
+        }
+        if (double.parse(price) <= 0) {
+          return 'Please enter a number greater than zero';
+        }
+        return null;
+      },
+      onSaved: (price) {
+        _stock = Stock(
+            id: _stock.id,
+            name: _stock.name,
+            ticker: _stock.ticker,
+            price: double.parse(price),
+            quantity: _stock.quantity);
+      },
+    );
+  }
+
+  //Text field for the quantity
+  Widget quantityTextField() {
+    return TextFormField(
+      initialValue: _stock.quantity > 0 ? _stock.quantity.toString() : "",
+      style: TextStyle(color: Theme.of(context).accentColor),
+      keyboardType: TextInputType.number,
+      decoration: textInputDecoration('Quantity'),
+      textInputAction: TextInputAction.done,
+      focusNode: _quantityFocusNode,
+      onFieldSubmitted: (_) {
+        _submitForm();
+      },
+      validator: (price) {
+        if (price.isEmpty) {
+          return 'PLease enter a quantity';
+        }
+        if (double.parse(price) == null) {
+          return 'Please enter a valid number';
+        }
+        if (double.parse(price) <= 0) {
+          return 'Please enter a number greater than zero';
+        }
+        return null;
+      },
+      onSaved: (quantity) {
+        _stock = Stock(
+            id: _stock.id,
+            name: _stock.name,
+            ticker: _stock.ticker,
+            price: _stock.price,
+            quantity: int.parse(quantity));
+      },
+    );
   }
 
   @override
@@ -123,103 +223,15 @@ class _AddStockScreenState extends State<AddStockScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 children: <Widget>[
-                  TextFormField(
-                    //Text field for the ticker
-                    initialValue: _stock.ticker,
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    keyboardType: TextInputType.name,
-                    decoration: textInputDecoration('Ticker'),
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) {
-                      FocusScope.of(context).requestFocus(_priceFocusNode);
-                    },
-                    validator: (ticker) {
-                      if (ticker.isEmpty) {
-                        return 'Please provide a ticker';
-                      }
-                      return null;
-                    },
-                    onSaved: (ticker) {
-                      _stock = Stock(
-                          id: _stock.id,
-                          name: _stock.name,
-                          ticker: ticker.toUpperCase(),
-                          price: _stock.price,
-                          quantity: _stock.quantity);
-                    },
-                  ),
+                  tickerTextField(),
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
-                    //Text field for the price
-                    initialValue:
-                        _stock.price > 0 ? _stock.price.toString() : '',
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    keyboardType: TextInputType.number,
-                    decoration: textInputDecoration('Price'),
-                    textInputAction: TextInputAction.next,
-                    focusNode: _priceFocusNode,
-                    onFieldSubmitted: (_) {
-                      FocusScope.of(context).requestFocus(_quantityFocusNode);
-                    },
-                    validator: (price) {
-                      if (price.isEmpty) {
-                        return 'PLease enter a price';
-                      }
-                      if (double.parse(price) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      if (double.parse(price) <= 0) {
-                        return 'Please enter a number greater than zero';
-                      }
-                      return null;
-                    },
-                    onSaved: (price) {
-                      _stock = Stock(
-                          id: _stock.id,
-                          name: _stock.name,
-                          ticker: _stock.ticker,
-                          price: double.parse(price),
-                          quantity: _stock.quantity);
-                    },
-                  ),
+                  priceTextField(),
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
-                    //Text field for the quantity
-                    initialValue:
-                        _stock.quantity > 0 ? _stock.quantity.toString() : "",
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    keyboardType: TextInputType.number,
-                    decoration: textInputDecoration('Quantity'),
-                    textInputAction: TextInputAction.done,
-                    focusNode: _quantityFocusNode,
-                    onFieldSubmitted: (_) {
-                      _submitForm();
-                    },
-                    validator: (price) {
-                      if (price.isEmpty) {
-                        return 'PLease enter a quantity';
-                      }
-                      if (double.parse(price) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      if (double.parse(price) <= 0) {
-                        return 'Please enter a number greater than zero';
-                      }
-                      return null;
-                    },
-                    onSaved: (quantity) {
-                      _stock = Stock(
-                          id: _stock.id,
-                          name: _stock.name,
-                          ticker: _stock.ticker,
-                          price: _stock.price,
-                          quantity: int.parse(quantity));
-                    },
-                  ),
+                  quantityTextField(),
                   SizedBox(
                     height: 40,
                   ),

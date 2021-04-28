@@ -53,7 +53,7 @@ class Stocks with ChangeNotifier {
   };
 
   //featch the current prices of the stocks in the list
-  Future<void> fetchCurrentPrices(bool needNotify) async {
+  Future<void> fetchCurrentPrices() async {
     //since we dont want to pay money we need to use 2 apis to get the prices
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
@@ -90,9 +90,6 @@ class Stocks with ChangeNotifier {
           stock.currentPrice = stockData[i]["regularMarketPrice"];
         }
       }
-    }
-    if(needNotify){
-      notifyListeners();
     }
   }
 
@@ -181,6 +178,7 @@ class Stocks with ChangeNotifier {
     return _stocks.firstWhere((prod) => prod.id == id);
   }
 
+  //removes a stock
   void removeStock(String id){
     int stockIndex = _stocks.indexWhere((stock) => stock.id == id);
     _stocks.removeAt(stockIndex);

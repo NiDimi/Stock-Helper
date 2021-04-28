@@ -11,6 +11,38 @@ class StockItem extends StatelessWidget {
 
   StockItem(this._stock);
 
+  //builds the way the prices are displayed
+  Widget stockPriceDisplay(String percentage, TextStyle style){
+    return Container(
+      width: 125,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Text(//text for the current price
+            (_stock.currentPrice * _stock.quantity).toStringAsFixed(2),
+            style: style,
+          ),
+          Container(//container for the percentage
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+                color: percentage.contains('+') ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(5))),
+            height: 30,
+            width: 80,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                percentage,
+                style: style,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final stocksData = Provider.of<Stocks>(context, listen: false);
@@ -27,7 +59,7 @@ class StockItem extends StatelessWidget {
           _stock.name,
           style: Theme.of(context).textTheme.headline2,
         ),
-        trailing: StockPrice(stock: _stock, percentage: percentage),
+        trailing: stockPriceDisplay(percentage, Theme.of(context).textTheme.bodyText1),
       ),
       secondaryActions: <Widget>[
         IconSlideAction(
@@ -40,7 +72,7 @@ class StockItem extends StatelessWidget {
         ),
         IconSlideAction(
           caption: 'Edit',
-          color: Colors.blue,
+          color: Color.fromARGB(255, 0, 0, 255),
           icon: Icons.edit,
           onTap: () {
             Navigator.of(context).pushNamed(AddStockScreen.routeName, arguments: _stock);
@@ -55,51 +87,6 @@ class StockItem extends StatelessWidget {
           },
         )
       ],
-    );
-  }
-}
-
-//class to set up the stock name
-class StockPrice extends StatelessWidget {
-  const StockPrice({
-    Key key,
-    @required Stock stock,
-    @required this.percentage,
-  })  : _stock = stock,
-        super(key: key);
-
-  final Stock _stock;
-  final String percentage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 125,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          Text(
-            (_stock.currentPrice * _stock.quantity).toStringAsFixed(2),
-            style: Theme.of(context).textTheme.bodyText1,
-          ),
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-                color: percentage.contains('+') ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            height: 30,
-            width: 80,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                percentage,
-                style: Theme.of(context).textTheme.bodyText1,
-              ),
-            ),
-          )
-        ],
-      ),
     );
   }
 }

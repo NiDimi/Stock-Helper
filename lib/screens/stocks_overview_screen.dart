@@ -1,97 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_helper/models/stock.dart';
 import 'package:stock_helper/providers/stocks.dart';
 import 'package:stock_helper/screens/add_stock_screen.dart';
 import 'package:stock_helper/widgets/stock_item.dart';
 
 //class that shows all the stocks
 class StocksOverviewScreen extends StatefulWidget {
+
   @override
   _StocksOverviewScreenState createState() => _StocksOverviewScreenState();
 }
 
 class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
-  var _isInit = true; //is necessary to set up the loading spinner
+  Future<void> _stocksFuture;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // //if we init set the state to loading, we need the api data
-    // if (_isInit) {
-    //   setState(() {
-    //     _isLoading = true;
-    //   });
-    //   Provider.of<Stocks>(context, listen: false)
-    //       .fetchCurrentPrices()
-    //       .then((_) {
-    //     setState(() {
-    //       _isLoading = false; //when we get them stop loading
-    //     });
-    //   });
-    // }
-    // _isInit = false;
+    _stocksFuture = Provider.of<Stocks>(context, listen: false).fetchCurrentPrices();
   }
 
   //function to re-fetch the stocks
   Future<void> _refreshStocks(BuildContext context) async {
-    await Provider.of<Stocks>(context, listen: false).fetchCurrentPrices(true);
+    setState(() {
+      _stocksFuture = Provider.of<Stocks>(context, listen: false).fetchCurrentPrices();
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final stocksData = Provider.of<Stocks>(context);
-    return Scaffold(
-      appBar: AppBar(
-        shadowColor: Colors.grey,
-        title: const Text('Your Stocks'),
-        actions: <Widget>[
-          IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                _isInit = true; //reset to re-fetch the prices
-                Navigator.of(context).pushNamed(AddStockScreen.routeName);
-              })
-        ],
-      ),
-      body: FutureBuilder(
-        future: stocksData.fetchCurrentPrices(false),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return RefreshIndicator(
-              backgroundColor: Colors.white,
-              color: Colors.black,
-              onRefresh: () => _refreshStocks(context),
-              child: Column(children: [
-                StocksDisplay(stocksData: stocksData),
-                Divider(
-                  color: Colors.white24,
-                  thickness: 5.0,
-                ),
-                RevenueDisplay(stocksData: stocksData)
-              ]),
-            );
-          }
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
-    );
-  }
-}
 
-//Display the revenue or loss in the page
-class RevenueDisplay extends StatelessWidget {
-  const RevenueDisplay({
-    Key key,
-    @required this.stocksData,
-  }) : super(key: key);
-
-  final Stocks stocksData;
-
-  @override
-  Widget build(BuildContext context) {
+  //display the revenue or loss
+  Widget revenueDisplay (Stocks stocksData){
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -115,19 +53,9 @@ class RevenueDisplay extends StatelessWidget {
       ),
     );
   }
-}
 
-//set up and display all the stocks
-class StocksDisplay extends StatelessWidget {
-  const StocksDisplay({
-    Key key,
-    @required this.stocksData,
-  }) : super(key: key);
-
-  final Stocks stocksData;
-
-  @override
-  Widget build(BuildContext context) {
+  //display all the stocks
+  Widget stocksDisplay (Stocks stocksData){
     return Container(
       padding: EdgeInsets.only(top: 10),
       height: 550, //use the screen size
@@ -146,4 +74,47 @@ class StocksDisplay extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final stocksData = Provider.of<Stocks>(context);
+    return Scaffold(
+      appBar: AppBar(
+        shadowColor: Colors.grey,
+        title: const Text('Your Stocks'),
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.of(context).pushNamed(AddStockScreen.routeName);
+              })
+        ],
+      ),
+      body: FutureBuilder(
+        future: _stocksFuture,
+        builder: (context, snapshot) {
+          if ((snapshot.connectionState == ConnectionState.done)) {
+            return RefreshIndicator(
+              backgroundColor: Colors.white,
+              color: Colors.black,
+              onRefresh: () => _refreshStocks(context),
+              child: Column(children: [
+                stocksDisplay(stocksData),
+                Divider(
+                  color: Colors.white24,
+                  thickness: 5.0,
+                ),
+                revenueDisplay(stocksData)
+              ]),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+
+
 }
