@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stock_helper/providers/portfolios.dart';
 import 'package:stock_helper/providers/stocks.dart';
 import 'package:stock_helper/screens/add_stock_screen.dart';
+import 'package:stock_helper/screens/portfolio_screen.dart';
 import 'package:stock_helper/screens/stocks_overview_screen.dart';
 
 void main() => runApp(MyApp());
@@ -20,6 +22,9 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(
           create: (_) => Stocks(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Portfolios(),
         )
       ],
       child: MaterialApp(
@@ -48,9 +53,10 @@ class _MyAppState extends State<MyApp> {
                     fontWeight: FontWeight.bold,
                     color: Colors.red),
                 bodyText1: TextStyle(color: Colors.white, fontSize: 15))),
-        home: StocksOverviewScreen(),
+        home: PortfolioScreen(),
         routes: {
           AddStockScreen.routeName: (_) => AddStockScreen(),
+          StocksOverviewScreen.routeName: (_) => StocksOverviewScreen(),
         },
       ),
     );

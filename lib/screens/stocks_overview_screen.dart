@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_helper/providers/stocks.dart';
 import 'package:stock_helper/screens/add_stock_screen.dart';
+import 'package:stock_helper/widgets/revenue_widget.dart';
 import 'package:stock_helper/widgets/stock_item.dart';
 
 //class that shows all the stocks
 class StocksOverviewScreen extends StatefulWidget {
+  static const routeName = '/stock-overview';
 
   @override
   _StocksOverviewScreenState createState() => _StocksOverviewScreenState();
@@ -25,33 +27,6 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
     setState(() {
       _stocksFuture = Provider.of<Stocks>(context, listen: false).fetchCurrentPrices();
     });
-  }
-
-
-  //display the revenue or loss
-  Widget revenueDisplay (Stocks stocksData){
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            stocksData.getRevenue() >= 0 ? "Revenue:" : "Lost:",
-            style: stocksData.getRevenue() >= 0
-                ? Theme.of(context).textTheme.headline3
-                : Theme.of(context).textTheme.headline4,
-          ),
-          Text(
-            stocksData.getRevenue() >= 0
-                ? "+${stocksData.getRevenue().toStringAsFixed(0)}"
-                : stocksData.getRevenue().toStringAsFixed(0),
-            style: stocksData.getRevenue() >= 0
-                ? Theme.of(context).textTheme.headline3
-                : Theme.of(context).textTheme.headline4,
-          )
-        ],
-      ),
-    );
   }
 
   //display all the stocks
@@ -104,7 +79,10 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
                   color: Colors.white24,
                   thickness: 5.0,
                 ),
-                revenueDisplay(stocksData)
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: RevenueWidget(stocksData.getRevenue(), MainAxisAlignment.spaceBetween),
+                )
               ]),
             );
           }

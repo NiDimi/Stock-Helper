@@ -133,11 +133,14 @@ class Stocks with ChangeNotifier {
 
   //get the total revenue from the stocks
   double getRevenue() {
-    double total = 0;
-    _stocks.forEach((stock) {
-      total += (stock.currentPrice - stock.price) * stock.quantity;
-    });
-    return total;
+    // double total = 0;
+    // _stocks.forEach((stock) {
+    //   total += (stock.currentPrice - stock.price) * stock.quantity;
+    // });
+    // return total;
+    //IMPORTANT harcoded value while working on portfolios
+
+    return 200;
   }
 
   //add a stock in the list
