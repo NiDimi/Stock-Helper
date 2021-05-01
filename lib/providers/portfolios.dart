@@ -16,11 +16,23 @@ class Portfolios with ChangeNotifier {
   }
 
   List<Portfolio> get portfolios {
-    return [... _portfolios];
+    return [..._portfolios];
   }
 
-  void addPortfolio(Portfolio portfolio){
+  void addPortfolio(Portfolio portfolio) {
     _portfolios.add(portfolio);
+    notifyListeners();
+  }
+
+  void removePortfolio(Portfolio portfolio) {
+    _portfolios.remove(portfolio);
+    notifyListeners();
+  }
+
+  void changePortfolioName(Portfolio portfolio, String newName) {
+    int portfolioIndex = _portfolios.indexWhere((element) => element == portfolio);
+    _portfolios.removeAt(portfolioIndex);
+    _portfolios.insert(portfolioIndex, new Portfolio(name: newName, portfolioStocks: portfolio.portfolioStocks));
     notifyListeners();
   }
 }

@@ -14,7 +14,7 @@ class PortfolioScreen extends StatelessWidget {
         title: const Text('Your Portfolios'),
         actions: <Widget>[
           IconButton(icon: const Icon(Icons.add), onPressed: () {
-            showModalBottomSheet(context: context, builder: (context) => NewPortfolioWidget(),);
+            showModalBottomSheet(context: context, builder: (context) => NewPortfolioWidget(null),);
           })
         ],
       ),
