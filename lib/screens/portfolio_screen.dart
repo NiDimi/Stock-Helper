@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_helper/providers/portfolios.dart';
+import 'package:stock_helper/widgets/app_drawer.dart';
 import 'package:stock_helper/widgets/new_portfolio_widget.dart';
 import 'package:stock_helper/widgets/portfolio_item.dart';
 
@@ -18,6 +19,7 @@ class PortfolioScreen extends StatelessWidget {
           })
         ],
       ),
+      drawer: AppDrawer(),
       body: GridView(
         children:
             portfolioData.portfolios.map((e) => PortfolioItem(e)).toList(),
