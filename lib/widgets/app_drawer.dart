@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stock_helper/screens/history_screen.dart';
+import 'package:stock_helper/screens/portfolio_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -7,49 +9,56 @@ class AppDrawer extends StatelessWidget {
     final dividerColor = Colors.white38;
     final iconColor = Color.fromARGB(255, 210, 210, 210);
     return Drawer(
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            title: Text('Name of the app'),
-            automaticallyImplyLeading: false,
-          ),
-          Divider(
-            color: dividerColor,
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.account_balance_wallet,
-              color: iconColor,
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          children: <Widget>[
+            AppBar(
+              title: Text('Name of the app'),
+              automaticallyImplyLeading: false,
             ),
-            title: Text(
-              'Portfolios',
-              style: textStyle,
+            Divider(
+              color: dividerColor,
             ),
-            onTap: () {},
-          ),
-          Divider(
-            color: dividerColor,
-          ),
-          ListTile(
-            leading: Icon(Icons.assessment_outlined , color: iconColor),
-            title: Text(
-              'Historic Data',
-              style: textStyle,
+            ListTile(
+              leading: Icon(
+                Icons.account_balance_wallet,
+                color: iconColor,
+              ),
+              title: Text(
+                'Portfolios',
+                style: textStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).pushReplacementNamed(PortfolioScreen.routeName);
+              },
             ),
-            onTap: () {},
-          ),
-          Divider(
-            color: dividerColor,
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app, color: iconColor),
-            title: Text(
-              'Logout',
-              style: textStyle,
+            Divider(
+              color: dividerColor,
             ),
-            onTap: () {},
-          ),
-        ],
+            ListTile(
+              leading: Icon(Icons.assessment_outlined , color: iconColor),
+              title: Text(
+                'Historic Data',
+                style: textStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).pushReplacementNamed(HistoryScreen.routeName);
+              },
+            ),
+            Expanded(child: Container()),Divider(
+              color: dividerColor,
+            ),
+            ListTile(
+              leading: Icon(Icons.exit_to_app, color: iconColor),
+              title: Text(
+                'Logout',
+                style: textStyle,
+              ),
+              onTap: () {},
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,8 @@ import 'package:stock_helper/widgets/new_portfolio_widget.dart';
 import 'package:stock_helper/widgets/portfolio_item.dart';
 
 class PortfolioScreen extends StatelessWidget {
+  static const routeName = '/portfolios';
+
   @override
   Widget build(BuildContext context) {
     final portfolioData = Provider.of<Portfolios>(context);

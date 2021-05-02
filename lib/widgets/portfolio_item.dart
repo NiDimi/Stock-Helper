@@ -117,7 +117,7 @@ class PortfolioItem extends StatelessWidget {
           ],
         ),
         decoration: BoxDecoration(
-            color: Color.fromARGB(255, 80, 80, 80),
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(15)),
       ),
     );

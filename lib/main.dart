@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:stock_helper/providers/portfolios.dart';
 import 'package:stock_helper/providers/stocks.dart';
 import 'package:stock_helper/screens/add_stock_screen.dart';
+import 'package:stock_helper/screens/history_screen.dart';
 import 'package:stock_helper/screens/portfolio_screen.dart';
 import 'package:stock_helper/screens/stocks_overview_screen.dart';
 
@@ -30,21 +31,23 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-            primaryColor: Color.fromARGB(255, 43, 43, 42),
-            accentColor: Colors.white,
-            canvasColor: Colors.black,
-            fontFamily: 'Lato',
-            textTheme: ThemeData
-                .light()
-                .textTheme
-                .copyWith(
+          primaryColor:  Color.fromARGB(255, 80, 80, 80),
+          accentColor: Colors.white,
+          canvasColor: Colors.black,
+          appBarTheme: AppBarTheme(
+            color:  Color.fromARGB(255, 43, 43, 42),
+            shadowColor: Colors.grey,
+            elevation: 5.0
+          ),
+          fontFamily: 'Lato',
+          textTheme: ThemeData.light().textTheme.copyWith(
                 headline1: TextStyle(
-                  //for the ticker
+                    //for the ticker
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
                 headline2: TextStyle(
-                  //for the name
+                    //for the name
                     fontSize: 18,
                     color: Colors.grey),
                 headline3: TextStyle(
@@ -56,18 +59,19 @@ class _MyAppState extends State<MyApp> {
                     fontWeight: FontWeight.bold,
                     color: Colors.red),
                 bodyText1: TextStyle(color: Colors.white, fontSize: 15),
-                bodyText2: TextStyle(color: Color.fromARGB(255, 210, 210, 210), fontSize: 18),//drawer style
-
+                bodyText2: TextStyle(
+                    color: Color.fromARGB(255, 210, 210, 210),
+                    fontSize: 18), //drawer style
+              ),
+        ),
+        home: HistoryScreen(),
+        routes: {
+          PortfolioScreen.routeName: (_) => PortfolioScreen(),
+          AddStockScreen.routeName: (_) => AddStockScreen(),
+          StocksOverviewScreen.routeName: (_) => StocksOverviewScreen(),
+          HistoryScreen.routeName: (_) => HistoryScreen(),
+        },
       ),
-    )
-    ,
-    home: PortfolioScreen(),
-    routes: {
-    AddStockScreen.routeName: (_) => AddStockScreen(),
-    StocksOverviewScreen.routeName: (_) => StocksOverviewScreen(),
-    },
-    )
-    ,
     );
   }
 }
