@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import '../../screens/stocks/add_stock_screen.dart';
+import 'package:provider/provider.dart';
+import '../../providers/historic_portfolios.dart';
 import '../../models/stock.dart';
 
 //Class for the stock item
@@ -83,12 +84,13 @@ class _StockItemState extends State<StockItem> {
     );
   }
 
-  Widget editSlideAction(BuildContext context) {
+  Widget editSlideAction() {
     return IconSlideAction(
       iconWidget: slideActionContainer(Icons.edit, 'Close'),
       color: slideActionColor,
       onTap: () {
-
+        Provider.of<HistoricPortfolios>(context, listen: false).addHistoricTransaction(_stock);
+        widget._removeStock(widget._stock.id);
       },
     );
   }
@@ -142,7 +144,7 @@ class _StockItemState extends State<StockItem> {
       child: stockListTile(context),
       secondaryActions: <Widget>[
         closeSlideAction(),
-        editSlideAction(context),
+        editSlideAction(),
         removeSlideAction(),
       ],
     );

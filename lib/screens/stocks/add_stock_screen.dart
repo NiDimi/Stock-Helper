@@ -28,10 +28,15 @@ class _AddStockScreenState extends State<AddStockScreen> {
   InputDecoration textInputDecoration(String title) {
     return InputDecoration(
       labelText: title,
-      labelStyle: Theme.of(context).textTheme.bodyText1,
+      labelStyle: Theme
+          .of(context)
+          .textTheme
+          .bodyText1,
       enabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(
-            style: BorderStyle.solid, color: Theme.of(context).accentColor),
+            style: BorderStyle.solid, color: Theme
+            .of(context)
+            .accentColor),
       ),
     );
   }
@@ -54,24 +59,33 @@ class _AddStockScreenState extends State<AddStockScreen> {
       //if the stock doesnt exist display a dialog informing the user
       await showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Invalid Ticker'),
-          content: Text(
-              'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Okay'),
-            )
-          ],
-        ),
+        builder: (context) =>
+            AlertDialog(
+              title: Text('Invalid Ticker'),
+              content: Text(
+                  'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
+              actions: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Okay'),
+                )
+              ],
+            ),
       );
     }
     setState(() {
       _isLoading = false;
     });
+    final portfolioId = ModalRoute
+        .of(context)
+        .settings
+        .arguments as String; //the portfolio id passed
+    if (portfolioId == null) {
+      //error
+    }
+    _stock.portfolioId = portfolioId;
     if (_stock != null) {
       //if the stock exists send it back
       Navigator.of(context).pop(_stock);
@@ -81,7 +95,9 @@ class _AddStockScreenState extends State<AddStockScreen> {
   //Text field for the ticker
   Widget tickerTextField() {
     return TextFormField(
-      style: TextStyle(color: Theme.of(context).accentColor),
+      style: TextStyle(color: Theme
+          .of(context)
+          .accentColor),
       keyboardType: TextInputType.name,
       decoration: textInputDecoration('Ticker'),
       textInputAction: TextInputAction.next,
@@ -108,7 +124,9 @@ class _AddStockScreenState extends State<AddStockScreen> {
   //Text field for the price
   Widget priceTextField() {
     return TextFormField(
-      style: TextStyle(color: Theme.of(context).accentColor),
+      style: TextStyle(color: Theme
+          .of(context)
+          .accentColor),
       keyboardType: TextInputType.number,
       decoration: textInputDecoration('Price'),
       textInputAction: TextInputAction.next,
@@ -142,7 +160,9 @@ class _AddStockScreenState extends State<AddStockScreen> {
   //Text field for the quantity
   Widget quantityTextField() {
     return TextFormField(
-      style: TextStyle(color: Theme.of(context).accentColor),
+      style: TextStyle(color: Theme
+          .of(context)
+          .accentColor),
       keyboardType: TextInputType.number,
       decoration: textInputDecoration('Quantity'),
       textInputAction: TextInputAction.done,
@@ -154,7 +174,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
         if (quantity.isEmpty) {
           return 'PLease enter a quantity';
         }
-        if(quantity.contains('.')){
+        if (quantity.contains('.')) {
           return 'Please enter an integer';
         }
         if (int.parse(quantity) == null) {
@@ -188,7 +208,10 @@ class _AddStockScreenState extends State<AddStockScreen> {
           ),
           Text(
             'Validating data',
-            style: Theme.of(context).textTheme.bodyText1,
+            style: Theme
+                .of(context)
+                .textTheme
+                .bodyText1,
           ),
         ],
       ),
@@ -219,9 +242,13 @@ class _AddStockScreenState extends State<AddStockScreen> {
             child: Text('Submit'),
             style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all(Theme.of(context).primaryColor),
+                MaterialStateProperty.all(Theme
+                    .of(context)
+                    .primaryColor),
                 foregroundColor:
-                    MaterialStateProperty.all(Theme.of(context).accentColor)),
+                MaterialStateProperty.all(Theme
+                    .of(context)
+                    .accentColor)),
           )
         ],
       ),

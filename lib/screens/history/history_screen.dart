@@ -9,8 +9,7 @@ class HistoryScreen extends StatelessWidget {
   static const routeName = '/history';
 
   //container for the historic portfolios
-  Widget historyDataContainer(BuildContext context) {
-    final historyData = Provider.of<HistoricPortfolios>(context);
+  Widget historyDataContainer(HistoricPortfolios historyData) {
     return Container(
       height: 400, //needs media query,
       child: ListView.builder(
@@ -23,6 +22,7 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final historyData = Provider.of<HistoricPortfolios>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Historic Transactions'),
@@ -32,13 +32,13 @@ class HistoryScreen extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: <Widget>[
-            historyDataContainer(context),
+            historyDataContainer(historyData),
             Expanded(child: Container()),
             Divider(
               color: Colors.white24,
               thickness: 5.0,
             ),
-            RevenueWidget(400, MainAxisAlignment.spaceBetween),
+            RevenueWidget(historyData.getRevenue(), MainAxisAlignment.spaceBetween),
             SizedBox(height: 10),
           ],
         ),

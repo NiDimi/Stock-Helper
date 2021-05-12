@@ -21,7 +21,7 @@ class _HistoryItemState extends State<HistoryItem> {
         widget._portfolio.name,
         style: Theme.of(context).textTheme.headline1,
       ),
-      subtitle: RevenueWidget(200,
+      subtitle: RevenueWidget(widget._portfolio.portfolioStocks.getRevenue(),
           MainAxisAlignment.start),
       trailing: IconButton(
         color: Colors.white,

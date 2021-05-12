@@ -29,7 +29,7 @@ class PortfolioScreen extends StatelessWidget {
       drawer: AppDrawer(),
       body: GridView(
         children:
-            portfolioData.portfolios.map((e) => PortfolioItem(e)).toList(),
+            portfolioData.portfolios.map((portfolio) => PortfolioItem(portfolio)).toList(),
         padding: const EdgeInsets.all(20),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 400,

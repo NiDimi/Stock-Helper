@@ -4,39 +4,47 @@ import '../models/stock.dart';
 
 class Stocks {
   DateTime _nextRequestTimer;
+  final portfolioId;
 
-  List<Stock> _stocks = [
-    Stock(
-      id: Uuid().v1(),
-      name: 'Google',
-      ticker: 'GOOG',
-      price: 2224.63,
-      quantity: 1,
-    ),
-    Stock(
-      id: Uuid().v1(),
-      name: 'Microsoft',
-      ticker: 'MSFT',
-      price: 258.24,
-      quantity: 2,
-    ),
-    Stock(
-      id: Uuid().v1(),
-      name: 'Facebook',
-      ticker: 'FB',
-      price: 301.55,
-      quantity: 1,
-    ),
-    Stock(
-      id: Uuid().v1(),
-      name: 'Apple',
-      ticker: 'AAPl',
-      price: 130.2,
-      quantity: 1,
-    ),
-  ];
 
-  // List<Stock> _stocks = [];
+  Stocks(this.portfolioId);
+
+  // List<Stock> _stocks = [
+  //   Stock(
+  //     id: Uuid().v1(),
+  //     name: 'Google',
+  //     ticker: 'GOOG',
+  //     price: 2224.63,
+  //     quantity: 1,
+  //     portfolioId: Uuid().v1(),
+  //   ),
+  //   Stock(
+  //     id: Uuid().v1(),
+  //     name: 'Microsoft',
+  //     ticker: 'MSFT',
+  //     price: 258.24,
+  //     quantity: 2,
+  //     portfolioId: Uuid().v1(),
+  //   ),
+  //   Stock(
+  //     id: Uuid().v1(),
+  //     name: 'Facebook',
+  //     ticker: 'FB',
+  //     price: 301.55,
+  //     quantity: 1,
+  //     portfolioId: Uuid().v1(),
+  //   ),
+  //   Stock(
+  //     id: Uuid().v1(),
+  //     name: 'Apple',
+  //     ticker: 'AAPl',
+  //     price: 130.2,
+  //     quantity: 1,
+  //     portfolioId: Uuid().v1(),
+  //   ),
+  // ];
+
+  List<Stock> _stocks = [];
 
   //getter for the stocks
   List<Stock> get stocks {

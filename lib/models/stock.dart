@@ -8,6 +8,7 @@ class Stock {
   final double price;
   final int quantity;
   double currentPrice;
+  String portfolioId;
 
   Stock({
     this.id,
@@ -16,6 +17,7 @@ class Stock {
     @required this.price,
     @required this.quantity,
     this.currentPrice,
+    this.portfolioId,
   });
 
   //get the percentage of the increase/decrease for the stock

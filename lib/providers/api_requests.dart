@@ -109,7 +109,8 @@ class ApiRequests with ChangeNotifier {
           ticker: stock.ticker,
           price: stock.price,
           quantity: stock.quantity,
-          currentPrice: price
+          currentPrice: price,
+          portfolioId: stock.portfolioId
         );
       }
       return null;

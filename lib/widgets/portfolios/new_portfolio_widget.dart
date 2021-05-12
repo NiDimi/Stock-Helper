@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../../providers/portfolios.dart';
 import '../../models/portfolio.dart';
 
@@ -36,7 +37,7 @@ class _NewPortfolioWidgetState extends State<NewPortfolioWidget> {
     _form.currentState.save();
     final portfoliosData = Provider.of<Portfolios>(context, listen: false);
     if (widget._prevPortfolio == null) {
-      portfoliosData.addPortfolio(new Portfolio(name: _name));
+      portfoliosData.addPortfolio(new Portfolio(name: _name, id: Uuid().v1()));
     } else {
       portfoliosData.changePortfolioName(widget._prevPortfolio, _name);
     }

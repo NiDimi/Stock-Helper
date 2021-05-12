@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../providers/portfolios.dart';
 import '../../widgets/revenue_widget.dart';
 import '../../widgets/stocks/stock_item.dart';
 import '../../providers/api_requests.dart';
@@ -95,7 +96,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
       icon: const Icon(Icons.add),
       onPressed: () async {
         var stock =
-            await Navigator.of(context).pushNamed(AddStockScreen.routeName);
+            await Navigator.of(context).pushNamed(AddStockScreen.routeName, arguments: _stocksData.portfolioId);
         if(stock != null) {
           setState(
                 () {
@@ -112,7 +113,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Stocks'),
+        title: Text(Provider.of<Portfolios>(context).findStockById(_stocksData.portfolioId).name),
         actions: <Widget>[
           _addStockButton(),
         ],
