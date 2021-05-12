@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:stock_helper/screens/history_screen.dart';
-import 'package:stock_helper/screens/portfolio_screen.dart';
+import '../screens/portfolios/portfolio_screen.dart';
+import '../screens/history/history_screen.dart';
 
 class AppDrawer extends StatelessWidget {
+
+  //tile for the portfolios screen
+  Widget portfoliosTile(){}
+
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.bodyText2;
@@ -14,7 +18,7 @@ class AppDrawer extends StatelessWidget {
         child: Column(
           children: <Widget>[
             AppBar(
-              title: Text('Name of the app'),
+              title: Text('Stockity'),
               automaticallyImplyLeading: false,
             ),
             Divider(

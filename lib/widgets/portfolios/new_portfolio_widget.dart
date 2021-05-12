@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_helper/models/portfolio.dart';
-import 'package:stock_helper/providers/portfolios.dart';
+import '../../providers/portfolios.dart';
+import '../../models/portfolio.dart';
 
+//widget for changing the name or adding new portfolios
 class NewPortfolioWidget extends StatefulWidget {
   final Portfolio _prevPortfolio;
-
 
   NewPortfolioWidget(this._prevPortfolio);
 
@@ -18,21 +18,24 @@ class _NewPortfolioWidgetState extends State<NewPortfolioWidget> {
   String _name;
 
   @override
-  initState(){
+  void initState() {
     super.initState();
-    if(widget._prevPortfolio != null) {
+    if (widget._prevPortfolio != null) {
       _name = widget._prevPortfolio.name;
     }
   }
 
+  //method for submitting the form
   Future<void> _submitForm() async {
+    //first we need to validate the form for correct data
     final isValid = _form.currentState.validate();
-    if(!isValid){
+    if (!isValid) {
       return;
     }
+
     _form.currentState.save();
     final portfoliosData = Provider.of<Portfolios>(context, listen: false);
-    if(widget._prevPortfolio == null){
+    if (widget._prevPortfolio == null) {
       portfoliosData.addPortfolio(new Portfolio(name: _name));
     } else {
       portfoliosData.changePortfolioName(widget._prevPortfolio, _name);
@@ -52,29 +55,32 @@ class _NewPortfolioWidgetState extends State<NewPortfolioWidget> {
             child: Column(
               children: <Widget>[
                 TextFormField(
-                  initialValue: _name == null ? "" : _name,
+                  initialValue: _name == null ? '' : _name,
                   decoration: InputDecoration(labelText: 'Portfolio Name'),
                   onFieldSubmitted: (_) {
                     _submitForm();
                   },
                   validator: (value) {
-                    if(value.isEmpty){
+                    if (value.isEmpty) {
                       return 'Please enter a name';
                     }
                     return null;
                   },
                   onSaved: (newValue) => _name = newValue,
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 ElevatedButton(
                   onPressed: _submitForm,
-                  child: Text(_name == null ?'Add new portfolio' : 'Change the name'),
+                  child: Text(
+                      _name == null ? 'Add new portfolio' : 'Change the name'),
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
                           Theme.of(context).primaryColor),
                       foregroundColor: MaterialStateProperty.all(
                           Theme.of(context).accentColor)),
-                )
+                ),
               ],
             ),
           ),

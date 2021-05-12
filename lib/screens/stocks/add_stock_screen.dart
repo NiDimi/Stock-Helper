@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_helper/models/stock.dart';
-import 'package:stock_helper/providers/stocks.dart';
+import '../../providers/api_requests.dart';
+import '../../models/stock.dart';
 
 class AddStockScreen extends StatefulWidget {
   static const routeName = '/add-stock';
@@ -16,19 +16,6 @@ class _AddStockScreenState extends State<AddStockScreen> {
   final _quantityFocusNode = FocusNode();
   var _stock = Stock(price: 0, quantity: 0, ticker: '');
   var _isLoading = false;
-  var _isInit = true;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_isInit) {
-      Stock prevStock = ModalRoute.of(context).settings.arguments as Stock;
-      if (prevStock != null) {
-        _stock = prevStock;
-      }
-    }
-    _isInit = false;
-  }
 
   @override
   void dispose() {
@@ -49,59 +36,51 @@ class _AddStockScreenState extends State<AddStockScreen> {
     );
   }
 
-  //Function for submitting the from
+  //function for submitting the form
   Future<void> _submitForm() async {
-    final isValid = _form.currentState.validate(); //validate the input
+    final isValid = _form.currentState.validate(); // first validate the input
     if (!isValid) {
-      return; //if it fails return
+      return;
     }
     _form.currentState.save();
     setState(() {
-      _isLoading =
-          true; //loading because we need to wait to check if the stock exists
+      //loading because we need to wait to check if the stock exists
+      _isLoading = true;
     });
-    final stocksData = Provider.of<Stocks>(context, listen: false);
-    if (_stock.id != null) {
-      stocksData.removeStock(_stock.id);
-    } else {
-      _stock = await stocksData.checkIfStockExists(_stock);
-      if (_stock == null) {
-        _stock =
-            Stock(price: 0, quantity: 0, ticker: ''); //reset it to the start
-        //if the stock doesnt exist display a dialog informing the user
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Invalid Ticker'),
-            content: Text(
-                'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
-            actions: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Okay'),
-              )
-            ],
-          ),
-        );
-      }
+    final apiRequests = Provider.of<ApiRequests>(context, listen: false);
+    _stock = await apiRequests.checkIfStockExists(_stock);
+    if (_stock == null) {
+      _stock = Stock(price: 0, quantity: 0, ticker: ''); //reset it to the start
+      //if the stock doesnt exist display a dialog informing the user
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Invalid Ticker'),
+          content: Text(
+              'You entered a ticker that doesn\'t exist. Please make sure that the ticker exist'),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Okay'),
+            )
+          ],
+        ),
+      );
     }
     setState(() {
       _isLoading = false;
     });
     if (_stock != null) {
-      //if the stock exists add the stock in the list and go back
-      stocksData.addStock(_stock);
-      Navigator.of(context).pop();
+      //if the stock exists send it back
+      Navigator.of(context).pop(_stock);
     }
   }
 
   //Text field for the ticker
   Widget tickerTextField() {
     return TextFormField(
-      initialValue: _stock.ticker,
-      enabled: _stock.name == null,
       style: TextStyle(color: Theme.of(context).accentColor),
       keyboardType: TextInputType.name,
       decoration: textInputDecoration('Ticker'),
@@ -129,7 +108,6 @@ class _AddStockScreenState extends State<AddStockScreen> {
   //Text field for the price
   Widget priceTextField() {
     return TextFormField(
-      initialValue: _stock.price > 0 ? _stock.price.toString() : '',
       style: TextStyle(color: Theme.of(context).accentColor),
       keyboardType: TextInputType.number,
       decoration: textInputDecoration('Price'),
@@ -164,7 +142,6 @@ class _AddStockScreenState extends State<AddStockScreen> {
   //Text field for the quantity
   Widget quantityTextField() {
     return TextFormField(
-      initialValue: _stock.quantity > 0 ? _stock.quantity.toString() : "",
       style: TextStyle(color: Theme.of(context).accentColor),
       keyboardType: TextInputType.number,
       decoration: textInputDecoration('Quantity'),
@@ -173,14 +150,17 @@ class _AddStockScreenState extends State<AddStockScreen> {
       onFieldSubmitted: (_) {
         _submitForm();
       },
-      validator: (price) {
-        if (price.isEmpty) {
+      validator: (quantity) {
+        if (quantity.isEmpty) {
           return 'PLease enter a quantity';
         }
-        if (double.parse(price) == null) {
+        if(quantity.contains('.')){
+          return 'Please enter an integer';
+        }
+        if (int.parse(quantity) == null) {
           return 'Please enter a valid number';
         }
-        if (double.parse(price) <= 0) {
+        if (int.parse(quantity) <= 0) {
           return 'Please enter a number greater than zero';
         }
         return null;
@@ -196,57 +176,65 @@ class _AddStockScreenState extends State<AddStockScreen> {
     );
   }
 
+  //widget to show while we are validating the input
+  Widget validatingDisplay() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CircularProgressIndicator(),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'Validating data',
+            style: Theme.of(context).textTheme.bodyText1,
+          ),
+        ],
+      ),
+    );
+  }
+
+  //widget to display the form
+  Widget formDisplay() {
+    return Form(
+      key: _form,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        children: <Widget>[
+          tickerTextField(),
+          SizedBox(
+            height: 20,
+          ),
+          priceTextField(),
+          SizedBox(
+            height: 20,
+          ),
+          quantityTextField(),
+          SizedBox(
+            height: 40,
+          ),
+          ElevatedButton(
+            onPressed: _submitForm,
+            child: Text('Submit'),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(Theme.of(context).primaryColor),
+                foregroundColor:
+                    MaterialStateProperty.all(Theme.of(context).accentColor)),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Your New Stock'),
+        title: const Text('Add Your New Stock'),
       ),
-      body: _isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Validating data',
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                ],
-              ),
-            )
-          : Form(
-              key: _form,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                children: <Widget>[
-                  tickerTextField(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  priceTextField(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  quantityTextField(),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    child: Text('Submit'),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).primaryColor),
-                        foregroundColor: MaterialStateProperty.all(
-                            Theme.of(context).accentColor)),
-                  )
-                ],
-              ),
-            ),
+      body: _isLoading ? validatingDisplay() : formDisplay(),
     );
   }
 }
