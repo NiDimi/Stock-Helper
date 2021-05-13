@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import '../providers/portfolios.dart';
 import '../models/portfolio.dart';
 import '../models/stock.dart';
-import 'package:uuid/uuid.dart';
-import './stocks.dart';
-import '../models/portfolio.dart';
 
 class HistoricPortfolios with ChangeNotifier {
   // static List<Portfolio> _portfolios = [

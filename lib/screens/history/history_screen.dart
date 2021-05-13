@@ -45,8 +45,8 @@ class HistoryScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: RevenueWidget(
-                        historyData.getRevenue(), MainAxisAlignment.spaceBetween),
+                    child: RevenueWidget(historyData.getRevenue(),
+                        MainAxisAlignment.spaceBetween),
                   ),
                   SizedBox(height: 10),
                 ],

@@ -22,14 +22,15 @@ class ApiRequests with ChangeNotifier {
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
 
-    if(!stocksData.readyForRequest()){//we only want to allow request after a certain time
+    if (!stocksData.readyForRequest()) {
+      //we only want to allow request after a certain time
       return;
     }
 
     List<Stock> stocks = stocksData.stocks;
 
-    if(stocks.isEmpty){
-      return;//make sure that we have stocks in the data passed
+    if (stocks.isEmpty) {
+      return; //make sure that we have stocks in the data passed
     }
 
     var response = await http.get(
@@ -37,6 +38,11 @@ class ApiRequests with ChangeNotifier {
           "https://twelve-data1.p.rapidapi.com/price?symbol=${getTickersStringTwelve(stocks)}&format=json&outputsize=30"),
       headers: twelveHeaders,
     );
+
+    if (response.statusCode >= 400) {
+      return;
+    }
+
     List<Stock> failedStocks =
         []; //list because twelve api may fail with some stocks, and we will try with the yahoo if it fails
 
@@ -58,6 +64,9 @@ class ApiRequests with ChangeNotifier {
             "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=${getTickersStringYahoo(failedStocks)}"),
         headers: yahooHeaders,
       );
+      if (response.statusCode >= 400) {
+        return;
+      }
       final extractedData = await jsonDecode(response.body);
 
       List<dynamic> stockData = extractedData["quoteResponse"]["result"];
@@ -98,6 +107,10 @@ class ApiRequests with ChangeNotifier {
       headers: yahooHeaders,
     );
 
+    if (response.statusCode >= 400) {
+      return null;
+    }
+
     //sometimes we get data for stocks that dont have a price we need to check the price, we need to check the price
     //if the code fails it means that it is an invalid ticker
     try {
@@ -105,14 +118,13 @@ class ApiRequests with ChangeNotifier {
       double price = extractedData['price']['regularMarketPrice']['raw'];
       if (price > 0) {
         return new Stock(
-          id: Uuid().v1(),
-          name: extractedData['price']['shortName'],
-          ticker: stock.ticker,
-          price: stock.price,
-          quantity: stock.quantity,
-          currentPrice: price,
-          portfolioId: stock.portfolioId
-        );
+            id: Uuid().v1(),
+            name: extractedData['price']['shortName'],
+            ticker: stock.ticker,
+            price: stock.price,
+            quantity: stock.quantity,
+            currentPrice: price,
+            portfolioId: stock.portfolioId);
       }
       return null;
     } catch (e) {

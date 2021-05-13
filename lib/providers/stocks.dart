@@ -6,7 +6,6 @@ class Stocks {
   DateTime _nextRequestTimer;
   final portfolioId;
 
-
   Stocks(this.portfolioId);
 
   // List<Stock> _stocks = [
@@ -78,11 +77,11 @@ class Stocks {
 
   //method so we can do request for the prices with a delay
   bool readyForRequest() {
-    if(_nextRequestTimer == null){
+    if (_nextRequestTimer == null) {
       _nextRequestTimer = DateTime.now().add(Duration(minutes: 10));
       return true;
     }
-    if(_nextRequestTimer.isBefore(DateTime.now())){
+    if (_nextRequestTimer.isBefore(DateTime.now())) {
       _nextRequestTimer = DateTime.now().add(Duration(minutes: 10));
       return true;
     }

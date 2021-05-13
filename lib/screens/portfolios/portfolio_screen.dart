@@ -31,7 +31,9 @@ class PortfolioScreen extends StatelessWidget {
       body: portfolioData.portfolios.isEmpty
           ? Center(
               child: Text(
-                  'You have no portfolios\nClick the "+" and start adding portfolios', textAlign: TextAlign.center,),
+                'You have no portfolios\nClick the "+" and start adding portfolios',
+                textAlign: TextAlign.center,
+              ),
             )
           : GridView(
               children: portfolioData.portfolios

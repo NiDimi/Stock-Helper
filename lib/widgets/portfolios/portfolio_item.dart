@@ -170,16 +170,18 @@ class _PortfolioItemState extends State<PortfolioItem> {
   Widget build(BuildContext context) {
     final currentPricesFuture = Provider.of<ApiRequests>(context, listen: false)
         .fetchCurrentPrices(widget._portfolio.portfolioStocks);
-    return widget._portfolio.portfolioStocks.stocks.isEmpty ? mainPortfolioDisplay() : FutureBuilder(
-      future: currentPricesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return mainPortfolioDisplay();
-        }
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
+    return widget._portfolio.portfolioStocks.stocks.isEmpty
+        ? mainPortfolioDisplay()
+        : FutureBuilder(
+            future: currentPricesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return mainPortfolioDisplay();
+              }
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
   }
 }

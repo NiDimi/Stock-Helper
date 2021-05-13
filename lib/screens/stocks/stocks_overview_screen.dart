@@ -25,7 +25,22 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
     if (_isInit) {
       _stocksData = ModalRoute.of(context).settings.arguments as Stocks;
       if (_stocksData == null) {
-        //error
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error!!!'),
+            content: Text(
+                'Something went wrong while trying to fetch the stocks. Please try again'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close'),
+              )
+            ],
+          ),
+        );
       }
       _stockPriceRequestFuture =
           Provider.of<ApiRequests>(context, listen: false)
@@ -130,7 +145,9 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
       body: _stocksData.stocks.isEmpty
           ? Center(
               child: Text(
-                  'This portfolio is still empty \nPress the "+" to start adding stocks',textAlign: TextAlign.center,),
+                'This portfolio is still empty \nPress the "+" to start adding stocks',
+                textAlign: TextAlign.center,
+              ),
             )
           : FutureBuilder(
               future: _stockPriceRequestFuture,
