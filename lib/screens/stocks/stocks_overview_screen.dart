@@ -50,15 +50,19 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
   }
 
   //widget to display all the stocks
-  Widget stocksDisplay() {
+  Widget stocksDisplay(double screenHeight) {
     return Container(
       padding: const EdgeInsets.only(top: 10),
-      height: 550, //use the screen size
+      height: screenHeight - 150, //use the screen size
       child: ListView.builder(
         shrinkWrap: true,
         itemBuilder: (_, index) => Column(
           children: <Widget>[
-            StockItem(_stocksData.stocks[index], _removeStock),
+            StockItem(
+              _stocksData.stocks[index],
+              _removeStock,
+              key: Key(_stocksData.stocks[index].id),
+            ),
             if (index != _stocksData.stocks.length - 1)
               Divider(
                 color: Colors.white24,
@@ -71,22 +75,24 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
   }
 
   //main widget for when the future loads
-  Widget mainStockDisplay() {
+  Widget mainStockDisplay(double screenHeight) {
     return RefreshIndicator(
       backgroundColor: Colors.white,
       color: Colors.black,
       onRefresh: () => _refreshStocks(context),
       child: Column(children: [
-        stocksDisplay(),
+        stocksDisplay(screenHeight),
+        Expanded(child: Container()),
         Divider(
           color: Colors.white24,
           thickness: 5.0,
         ),
         Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
           child: RevenueWidget(
               _stocksData.getRevenue(), MainAxisAlignment.spaceBetween),
-        )
+        ),
+        SizedBox(height: 10),
       ]),
     );
   }
@@ -95,11 +101,12 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
     return IconButton(
       icon: const Icon(Icons.add),
       onPressed: () async {
-        var stock =
-            await Navigator.of(context).pushNamed(AddStockScreen.routeName, arguments: _stocksData.portfolioId);
-        if(stock != null) {
+        var stock = await Navigator.of(context).pushNamed(
+            AddStockScreen.routeName,
+            arguments: _stocksData.portfolioId);
+        if (stock != null) {
           setState(
-                () {
+            () {
               _stocksData.addStock(stock);
               // _refreshStocks(context);
             },
@@ -113,20 +120,23 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Provider.of<Portfolios>(context).findStockById(_stocksData.portfolioId).name),
+        title: Text(Provider.of<Portfolios>(context)
+            .findStockById(_stocksData.portfolioId)
+            .name),
         actions: <Widget>[
           _addStockButton(),
         ],
       ),
       body: _stocksData.stocks.isEmpty
           ? Center(
-              child: Text('Start adding stocks'),
+              child: Text(
+                  'This portfolio is still empty \nPress the "+" to start adding stocks',textAlign: TextAlign.center,),
             )
           : FutureBuilder(
               future: _stockPriceRequestFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return mainStockDisplay();
+                  return mainStockDisplay(MediaQuery.of(context).size.height);
                 }
                 return Center(
                   child: CircularProgressIndicator(),

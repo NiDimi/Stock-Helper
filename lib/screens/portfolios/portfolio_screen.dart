@@ -12,6 +12,7 @@ class PortfolioScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final portfolioData = Provider.of<Portfolios>(context);
+    final gridItemHeight = MediaQuery.of(context).size.height / 3.5;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Portfolios'),
@@ -27,17 +28,22 @@ class PortfolioScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: GridView(
-        children:
-            portfolioData.portfolios.map((portfolio) => PortfolioItem(portfolio)).toList(),
-        padding: const EdgeInsets.all(20),
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 400,
-          childAspectRatio: 7 / 4,
-          crossAxisSpacing: 100,
-          mainAxisSpacing: 20,
-        ),
-      ),
+      body: portfolioData.portfolios.isEmpty
+          ? Center(
+              child: Text(
+                  'You have no portfolios\nClick the "+" and start adding portfolios', textAlign: TextAlign.center,),
+            )
+          : GridView(
+              children: portfolioData.portfolios
+                  .map((portfolio) => PortfolioItem(portfolio, gridItemHeight))
+                  .toList(),
+              padding: const EdgeInsets.all(20),
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: MediaQuery.of(context).size.width,
+                mainAxisExtent: gridItemHeight,
+                mainAxisSpacing: 20,
+              ),
+            ),
     );
   }
 }

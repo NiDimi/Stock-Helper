@@ -9,16 +9,15 @@ class StockItem extends StatefulWidget {
   final Stock _stock;
   final Function _removeStock;
 
-  StockItem(this._stock, this._removeStock);
+  const StockItem(this._stock, this._removeStock, {Key key}) : super(key: key);
 
   @override
   _StockItemState createState() => _StockItemState();
 }
 
 class _StockItemState extends State<StockItem> {
-  Stock _stock;// we may edit the certain stock
-  final slideActionColor =  Color.fromARGB(255, 40, 40, 40);
-
+  Stock _stock; // we may edit the certain stock
+  final slideActionColor = Color.fromARGB(255, 40, 40, 40);
 
   @override
   void initState() {
@@ -36,7 +35,8 @@ class _StockItemState extends State<StockItem> {
         children: <Widget>[
           Text(
             //text for the current price
-            (widget._stock.currentPrice * widget._stock.quantity).toStringAsFixed(2),
+            (widget._stock.currentPrice * widget._stock.quantity)
+                .toStringAsFixed(2),
             style: style,
           ),
           Container(
@@ -49,9 +49,12 @@ class _StockItemState extends State<StockItem> {
             width: 80,
             child: Align(
               alignment: Alignment.centerRight,
-              child: Text(
-                percentage,
-                style: style,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  percentage,
+                  style: style,
+                ),
               ),
             ),
           ),
@@ -89,7 +92,8 @@ class _StockItemState extends State<StockItem> {
       iconWidget: slideActionContainer(Icons.edit, 'Close'),
       color: slideActionColor,
       onTap: () {
-        Provider.of<HistoricPortfolios>(context, listen: false).addHistoricTransaction(_stock);
+        Provider.of<HistoricPortfolios>(context, listen: false)
+            .addHistoricTransaction(_stock);
         widget._removeStock(widget._stock.id);
       },
     );
@@ -105,7 +109,7 @@ class _StockItemState extends State<StockItem> {
     );
   }
 
-  Widget slideActionContainer(IconData icon, String title){
+  Widget slideActionContainer(IconData icon, String title) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.black,

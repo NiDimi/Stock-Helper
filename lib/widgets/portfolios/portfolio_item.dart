@@ -15,8 +15,9 @@ enum MenuOption {
 
 class PortfolioItem extends StatefulWidget {
   final Portfolio _portfolio;
+  final double _height;
 
-  PortfolioItem(this._portfolio);
+  PortfolioItem(this._portfolio, this._height);
 
   @override
   _PortfolioItemState createState() => _PortfolioItemState();
@@ -25,10 +26,13 @@ class PortfolioItem extends StatefulWidget {
 class _PortfolioItemState extends State<PortfolioItem> {
   Widget portfolioTitle(BuildContext context) {
     return ListTile(
-      title: Text(
-        widget._portfolio.name,
-        style: Theme.of(context).textTheme.headline1,
-        textAlign: TextAlign.center,
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          widget._portfolio.name,
+          style: Theme.of(context).textTheme.headline1,
+          textAlign: TextAlign.center,
+        ),
       ),
       trailing: PopupMenuButton(
         onSelected: (MenuOption selectedValue) {
@@ -73,6 +77,7 @@ class _PortfolioItemState extends State<PortfolioItem> {
     );
   }
 
+  //widget to be displayed when we dont have stocks in the portfolio
   Widget emptyStocks(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -88,11 +93,12 @@ class _PortfolioItemState extends State<PortfolioItem> {
     );
   }
 
+  //Widget that display the stock data
   Widget stockDisplay(BuildContext context) {
     return Column(
       children: <Widget>[
         Container(
-          height: 80,
+          height: widget._height - 120,
           width: double.infinity,
           child: SingleChildScrollView(
             child: Column(
@@ -164,7 +170,7 @@ class _PortfolioItemState extends State<PortfolioItem> {
   Widget build(BuildContext context) {
     final currentPricesFuture = Provider.of<ApiRequests>(context, listen: false)
         .fetchCurrentPrices(widget._portfolio.portfolioStocks);
-    return FutureBuilder(
+    return widget._portfolio.portfolioStocks.stocks.isEmpty ? mainPortfolioDisplay() : FutureBuilder(
       future: currentPricesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {

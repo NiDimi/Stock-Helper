@@ -25,12 +25,6 @@ class HistoricPortfolios with ChangeNotifier {
     return [..._portfolios];
   }
 
-  // //add new portfolio to the historic ones
-  // void addPortfolio(Portfolio portfolio) {
-  //   _portfolios.add(portfolio);
-  //   notifyListeners();
-  // }
-
   //close a stock and added into the historic data
   void addHistoricTransaction(Stock stock){
     //first we need to check if we already have a portfolio that the stock belongs too
@@ -45,6 +39,7 @@ class HistoricPortfolios with ChangeNotifier {
     _portfolios[_portfolios.length - 1].portfolioStocks.addStock(stock);
   }
 
+  //gets the revenue of all the portfolios
   double getRevenue(){
     double total = 0;
     for (Portfolio portfolio in _portfolios){

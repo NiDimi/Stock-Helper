@@ -22,11 +22,12 @@ class ApiRequests with ChangeNotifier {
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
 
-    if(!stocksData.readyForRequest()){
+    if(!stocksData.readyForRequest()){//we only want to allow request after a certain time
       return;
     }
 
     List<Stock> stocks = stocksData.stocks;
+
     if(stocks.isEmpty){
       return;//make sure that we have stocks in the data passed
     }

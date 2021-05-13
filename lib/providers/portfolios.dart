@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../models/portfolio.dart';
 
 class Portfolios with ChangeNotifier {
-  //list with all the portfolios
+  // list with all the portfolios
   // static List<Portfolio> _portfolios = [
   //   Portfolio(name: 'Technology Stocks', id: Uuid().v1()),
   //   Portfolio(name: 'Fashion Stocks', id: Uuid().v1()),
@@ -33,12 +33,12 @@ class Portfolios with ChangeNotifier {
     // we get the index of the portfolio we want to change its name,
     // remove it from the list and add a new one with the same data but with the new name in each place
     int portfolioIndex =
-        _portfolios.indexWhere((element) => element == portfolio);
+    _portfolios.indexWhere((element) => element == portfolio);
     _portfolios.removeAt(portfolioIndex);
     _portfolios.insert(
         portfolioIndex,
         new Portfolio(
-            id: Uuid().v1(),
+            id: portfolio.id,
             name: newName,
             portfolioStocks: portfolio.portfolioStocks));
     notifyListeners();

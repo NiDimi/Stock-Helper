@@ -74,22 +74,23 @@ class _AddStockScreenState extends State<AddStockScreen> {
               ],
             ),
       );
+    } else {
+      final portfolioId = ModalRoute
+          .of(context)
+          .settings
+          .arguments as String; //the portfolio id passed
+      if (portfolioId == null) {
+        //error
+      }
+      _stock.portfolioId = portfolioId;
+      if (_stock != null) {
+        //if the stock exists send it back
+        Navigator.of(context).pop(_stock);
+      }
     }
     setState(() {
       _isLoading = false;
     });
-    final portfolioId = ModalRoute
-        .of(context)
-        .settings
-        .arguments as String; //the portfolio id passed
-    if (portfolioId == null) {
-      //error
-    }
-    _stock.portfolioId = portfolioId;
-    if (_stock != null) {
-      //if the stock exists send it back
-      Navigator.of(context).pop(_stock);
-    }
   }
 
   //Text field for the ticker

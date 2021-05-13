@@ -9,9 +9,9 @@ class HistoryScreen extends StatelessWidget {
   static const routeName = '/history';
 
   //container for the historic portfolios
-  Widget historyDataContainer(HistoricPortfolios historyData) {
+  Widget historyDataContainer(double height, HistoricPortfolios historyData) {
     return Container(
-      height: 400, //needs media query,
+      height: height - 150,
       child: ListView.builder(
         itemCount: historyData.portfolios.length,
         itemBuilder: (context, index) =>
@@ -28,21 +28,30 @@ class HistoryScreen extends StatelessWidget {
         title: Text('Historic Transactions'),
       ),
       drawer: AppDrawer(),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: <Widget>[
-            historyDataContainer(historyData),
-            Expanded(child: Container()),
-            Divider(
-              color: Colors.white24,
-              thickness: 5.0,
+      body: historyData.portfolios.isEmpty
+          ? Center(
+              child: Text('You haven\'t closed any stocks yet'),
+            )
+          : Container(
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                children: <Widget>[
+                  historyDataContainer(
+                      MediaQuery.of(context).size.height, historyData),
+                  Expanded(child: Container()),
+                  Divider(
+                    color: Colors.white24,
+                    thickness: 5.0,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: RevenueWidget(
+                        historyData.getRevenue(), MainAxisAlignment.spaceBetween),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
             ),
-            RevenueWidget(historyData.getRevenue(), MainAxisAlignment.spaceBetween),
-            SizedBox(height: 10),
-          ],
-        ),
-      ),
     );
   }
 }
