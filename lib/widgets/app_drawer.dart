@@ -18,7 +18,10 @@ class AppDrawer extends StatelessWidget {
         child: Column(
           children: <Widget>[
             AppBar(
-              title: Text('Stockity'),
+              title: Image.asset(
+                'assets/images/logo.png',
+                height: 180,
+              ),
               automaticallyImplyLeading: false,
             ),
             Divider(

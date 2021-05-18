@@ -104,11 +104,30 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: RevenueWidget(
-              _stocksData.getRevenue(), MainAxisAlignment.spaceBetween),
+          child: Row(
+            children: [
+              Expanded(
+                child: RevenueWidget(
+                    _stocksData.getRevenue(), MainAxisAlignment.spaceBetween),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              _revenuePercentageText(),
+            ],
+          ),
         ),
         SizedBox(height: 10),
       ]),
+    );
+  }
+
+  Widget _revenuePercentageText() {
+    return Text(
+      '(${(_stocksData.getRevenue() / _stocksData.getTotalSpent() * 100).toStringAsFixed(2)}%)',
+      style: _stocksData.getRevenue() >= 0
+          ? Theme.of(context).textTheme.headline3
+          : Theme.of(context).textTheme.headline4,
     );
   }
 

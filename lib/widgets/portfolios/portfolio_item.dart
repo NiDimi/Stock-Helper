@@ -113,7 +113,7 @@ class _PortfolioItemState extends State<PortfolioItem> {
                         style: Theme.of(context).textTheme.bodyText1,
                       ),
                       Text(
-                        stock.currentPrice.toStringAsFixed(2),
+                        stock.getPercentage(),
                         style: TextStyle(
                             fontSize: 15,
                             color: stock.currentPrice > stock.price

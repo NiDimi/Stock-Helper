@@ -49,7 +49,7 @@ class _HistoryItemState extends State<HistoryItem> {
                   children: <Widget>[
                     Text(stock.name),
                     Text(
-                      stock.price.toStringAsFixed(2),
+                      ((stock.currentPrice - stock.price) * stock.quantity).toStringAsFixed(2),
                     ),
                   ],
                 ),

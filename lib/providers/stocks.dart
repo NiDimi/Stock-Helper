@@ -59,6 +59,15 @@ class Stocks {
     return total;
   }
 
+  //gets the total spent amount
+  double getTotalSpent(){
+    double total = 0;
+    _stocks.forEach((stock) {
+      total += stock.price;
+    });
+    return total;
+  }
+
   //find a stock in the list using its id
   Stock findStockById(String id) {
     return _stocks.firstWhere((prod) => prod.id == id);
@@ -87,4 +96,6 @@ class Stocks {
     }
     return false;
   }
+
+
 }
