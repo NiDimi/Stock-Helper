@@ -95,9 +95,6 @@ class _AddStockScreenState extends State<AddStockScreen> {
         Navigator.of(context).pop(_stock);
       }
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   //Text field for the ticker

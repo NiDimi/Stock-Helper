@@ -6,8 +6,33 @@ import '../../widgets/portfolios/portfolio_item.dart';
 import '../../providers/portfolios.dart';
 
 //main screen that shows the portfolios
-class PortfolioScreen extends StatelessWidget {
+class PortfolioScreen extends StatefulWidget {
   static const routeName = '/portfolios';
+
+  @override
+  _PortfolioScreenState createState() => _PortfolioScreenState();
+}
+
+class _PortfolioScreenState extends State<PortfolioScreen> {
+  var _isInit = true;
+
+  var _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Portfolios>(context).fetchAndSetPortfolios().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +53,29 @@ class PortfolioScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: portfolioData.portfolios.isEmpty
+      body: _isLoading
           ? Center(
-              child: Text(
-                'You have no portfolios\nClick the "+" and start adding portfolios',
-                textAlign: TextAlign.center,
-              ),
+              child: CircularProgressIndicator(),
             )
-          : GridView(
-              children: portfolioData.portfolios
-                  .map((portfolio) => PortfolioItem(portfolio, gridItemHeight))
-                  .toList(),
-              padding: const EdgeInsets.all(20),
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: MediaQuery.of(context).size.width,
-                mainAxisExtent: gridItemHeight,
-                mainAxisSpacing: 20,
-              ),
-            ),
+          : portfolioData.portfolios.isEmpty
+              ? Center(
+                  child: Text(
+                    'You have no portfolios\nClick the "+" and start adding portfolios',
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : GridView(
+                  children: portfolioData.portfolios
+                      .map((portfolio) =>
+                          PortfolioItem(portfolio, gridItemHeight))
+                      .toList(),
+                  padding: const EdgeInsets.all(20),
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: MediaQuery.of(context).size.width,
+                    mainAxisExtent: gridItemHeight,
+                    mainAxisSpacing: 20,
+                  ),
+                ),
     );
   }
 }

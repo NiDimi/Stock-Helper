@@ -27,12 +27,6 @@ class ApiRequests with ChangeNotifier {
       return;
     }
 
-    var response1 = await http.get(
-      Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/orders.json'),
-    );
-    print(response1.body);
-
     List<Stock> stocks = stocksData.stocks;
 
     if (stocks.isEmpty) {

@@ -35,14 +35,14 @@ class _PortfolioItemState extends State<PortfolioItem> {
         ),
       ),
       trailing: PopupMenuButton(
-        onSelected: (MenuOption selectedValue) {
+        onSelected: (MenuOption selectedValue) async {
           if (selectedValue == MenuOption.Edit) {
             showModalBottomSheet(
               context: context,
               builder: (context) => NewPortfolioWidget(widget._portfolio),
             );
           } else {
-            Provider.of<Portfolios>(context, listen: false)
+            await Provider.of<Portfolios>(context, listen: false)
                 .removePortfolio(widget._portfolio);
           }
         },
