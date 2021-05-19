@@ -35,15 +35,16 @@ class Portfolios with ChangeNotifier {
 
   //method to remove a portfolio
   Future<void> removePortfolio(Portfolio portfolio) async {
+    //first remove so the user wont have the delay in the remove
+    _portfolios.remove(portfolio);
+    notifyListeners();
     var response = await http.delete(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/${portfolio.id}.json'),
     );
     if (response.statusCode >= 400) {
-      return;
+      _portfolios.add(portfolio);//if we failed removing add it back in
     }
-    _portfolios.remove(portfolio);
-    notifyListeners();
   }
 
   //method to change a portfolios name

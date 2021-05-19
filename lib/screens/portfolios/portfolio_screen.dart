@@ -14,17 +14,17 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-  var _isInit = true;
-
   var _isLoading = false;
+  var _isInit = true;
 
   @override
   void didChangeDependencies() {
-    if (_isInit) {
+    final portfolioData = Provider.of<Portfolios>(context, listen: false);
+    if (portfolioData.portfolios.isEmpty && _isInit) {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<Portfolios>(context).fetchAndSetPortfolios().then((_) {
+      Provider.of<Portfolios>(context, listen: false).fetchAndSetPortfolios().then((_) {
         setState(() {
           _isLoading = false;
         });
