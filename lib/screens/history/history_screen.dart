@@ -5,10 +5,37 @@ import '../../widgets/app_drawer.dart';
 import '../../widgets/history/history_item.dart';
 import '../../widgets/revenue_widget.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   static const routeName = '/history';
 
-  //container for the historic portfolios
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  var _isLoading = false;
+  var _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    final portfolioData =
+        Provider.of<HistoricPortfolios>(context, listen: false);
+    if (portfolioData.portfolios.isEmpty && _isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<HistoricPortfolios>(context, listen: false)
+          .fetchAndSetHistoricData()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
   Widget historyDataContainer(double height, HistoricPortfolios historyData) {
     return Container(
       height: height - 150,
@@ -28,30 +55,34 @@ class HistoryScreen extends StatelessWidget {
         title: Text('Historic Transactions'),
       ),
       drawer: AppDrawer(),
-      body: historyData.portfolios.isEmpty
+      body: _isLoading
           ? Center(
-              child: Text('You haven\'t closed any stocks yet'),
+              child: CircularProgressIndicator(),
             )
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: <Widget>[
-                  historyDataContainer(
-                      MediaQuery.of(context).size.height, historyData),
-                  Expanded(child: Container()),
-                  Divider(
-                    color: Colors.white24,
-                    thickness: 5.0,
+          : historyData.portfolios.isEmpty
+              ? Center(
+                  child: Text('You haven\'t closed any stocks yet'),
+                )
+              : Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    children: <Widget>[
+                      historyDataContainer(
+                          MediaQuery.of(context).size.height, historyData),
+                      Expanded(child: Container()),
+                      Divider(
+                        color: Colors.white24,
+                        thickness: 5.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: RevenueWidget(historyData.getRevenue(),
+                            MainAxisAlignment.spaceBetween),
+                      ),
+                      SizedBox(height: 10),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: RevenueWidget(historyData.getRevenue(),
-                        MainAxisAlignment.spaceBetween),
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
+                ),
     );
   }
 }

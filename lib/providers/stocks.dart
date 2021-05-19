@@ -50,6 +50,10 @@ class Stocks {
     return [..._stocks];
   }
 
+  set stocks(List<Stock> value) {
+    _stocks = value;
+  }
+
   //get the total revenue from the stocks
   double getRevenue() {
     double total = 0;
@@ -60,7 +64,7 @@ class Stocks {
   }
 
   //gets the total spent amount
-  double getTotalSpent(){
+  double getTotalSpent() {
     double total = 0;
     _stocks.forEach((stock) {
       total += stock.price;
@@ -96,6 +100,4 @@ class Stocks {
     }
     return false;
   }
-
-
 }
