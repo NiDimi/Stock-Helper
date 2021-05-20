@@ -1,11 +1,11 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+
 import './stocks.dart';
 import '../providers/portfolios.dart';
 import '../models/portfolio.dart';
 import '../models/stock.dart';
-import 'package:http/http.dart' as http;
 
 class HistoricPortfolios with ChangeNotifier {
   // list with all the portfolios
@@ -30,31 +30,25 @@ class HistoricPortfolios with ChangeNotifier {
 
   //adds a stock to an existing portfolio in the history screen
   Future<void> _addExistingPortfolio(int index, Stock stock) async {
-    _portfolios[index].portfolioStocks.addStock(stock);
     var response = await http.patch(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[index].id}.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[index].id}/stocks/${_portfolios[index].portfolioStocks.stocks.length}.json'),
       body: json.encode({
-        'name': _portfolios[index].name,
-        'stocks': _portfolios[index]
-            .portfolioStocks
-            .stocks
-            .map((stock) => {
-                  'id': stock.id,
-                  'name': stock.name,
-                  'ticker': stock.ticker,
-                  'price': stock.price,
-                  'quantity': stock.quantity,
-                  'portfolioId': stock.portfolioId,
-                  'currentPrice': stock.currentPrice,
-                })
-            .toList(),
+        'id': stock.id,
+        'name': stock.name,
+        'ticker': stock.ticker,
+        'price': stock.price,
+        'quantity': stock.quantity,
+        'portfolioId': stock.portfolioId,
+        'currentPrice': stock.currentPrice,
       }),
     );
+
     if (response.statusCode >= 400) {
-      //if it fails remove it
-      _portfolios[index].portfolioStocks.removeStock(stock.id);
+      return;
     }
+
+    _portfolios[index].portfolioStocks.addStock(stock);
   }
 
   //generates a new portfolio since we closed a new portfolio

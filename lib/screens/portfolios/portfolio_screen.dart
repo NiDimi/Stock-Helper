@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../providers/historic_portfolios.dart';
 import '../../widgets/app_drawer.dart';
 import '../../widgets/portfolios/new_portfolio_widget.dart';
 import '../../widgets/portfolios/portfolio_item.dart';
@@ -29,6 +30,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           _isLoading = false;
         });
       });
+      //here too because we want the historic data from the start
+      Provider.of<HistoricPortfolios>(context, listen: false).fetchAndSetHistoricData();
     }
     _isInit = false;
     super.didChangeDependencies();
