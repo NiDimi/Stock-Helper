@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:stock_helper/models/stock.dart';
+import 'package:stock_helper/providers/stocks.dart';
 import '../models/portfolio.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,7 +18,7 @@ class Portfolios with ChangeNotifier {
 
   //method to add a new portfolio
   Future<void> addPortfolio(Portfolio portfolio) async {
-    var response = await http.post(
+    final response = await http.post(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios.json'),
       body: json.encode(
@@ -38,22 +40,23 @@ class Portfolios with ChangeNotifier {
     //first remove so the user wont have the delay in the remove
     _portfolios.remove(portfolio);
     notifyListeners();
-    var response = await http.delete(
+    final response = await http.delete(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/${portfolio.id}.json'),
     );
     if (response.statusCode >= 400) {
-      _portfolios.add(portfolio);//if we failed removing add it back in
+      _portfolios.add(portfolio); //if we failed removing add it back in
     }
   }
 
   //method to change a portfolios name
-  Future<void> changePortfolioName(Portfolio oldPortfolio, String newName) async {
+  Future<void> changePortfolioName(
+      Portfolio oldPortfolio, String newName) async {
     // we get the index of the portfolio we want to change its name,
     // remove it from the list and add a new one with the same data but with the new name in each place
     int portfolioIndex =
         _portfolios.indexWhere((element) => element == oldPortfolio);
-    var response = await http.patch(
+    final response = await http.patch(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/${oldPortfolio.id}.json'),
       body: json.encode(
@@ -79,7 +82,7 @@ class Portfolios with ChangeNotifier {
 
   //fetches and sets the portfolios from firebase
   Future<void> fetchAndSetPortfolios() async {
-    var response = await http.get(
+    final response = await http.get(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios.json'),
     );
@@ -90,8 +93,27 @@ class Portfolios with ChangeNotifier {
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData != null) {
       extractedData.forEach((portfolioId, portfolioData) {
+        var tempStocksObj;
+        try {
+         tempStocksObj = Stocks(
+              portfolioData['stocks'][0]['portfolioId']);
+          tempStocksObj.stocks = (portfolioData['stocks'] as List<dynamic>)
+              .map((stock) =>
+              Stock(
+                id: stock['id'],
+                name: stock['name'],
+                ticker: stock['ticker'],
+                price: stock['price'],
+                quantity: stock['quantity'],
+                portfolioId: stock['portfolioId'],
+                currentPrice: stock['currentPrice'],
+              ))
+              .toList();
+        } catch(e){
+          //just means stocks are empty
+        }
         _portfolios
-            .add(Portfolio(id: portfolioId, name: portfolioData['name']));
+            .add(Portfolio(id: portfolioId, name: portfolioData['name'], portfolioStocks: tempStocksObj));
       });
     }
   }

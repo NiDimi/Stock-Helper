@@ -30,7 +30,7 @@ class HistoricPortfolios with ChangeNotifier {
 
   //adds a stock to an existing portfolio in the history screen
   Future<void> _addExistingPortfolio(int index, Stock stock) async {
-    var response = await http.patch(
+    final response = await http.patch(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[index].id}/stocks/${_portfolios[index].portfolioStocks.stocks.length}.json'),
       body: json.encode({
@@ -58,7 +58,7 @@ class HistoricPortfolios with ChangeNotifier {
         .firstWhere((portfolio) => portfolio.id == stock.portfolioId)
         .name;
 
-    var response = await http.post(
+    final response = await http.post(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json'),
       body: json.encode({
@@ -96,7 +96,7 @@ class HistoricPortfolios with ChangeNotifier {
 
   //fetches and sets the historic transactions from firebase
   Future<void> fetchAndSetHistoricData() async {
-    var response = await http.get(
+    final response = await http.get(
       Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json'),
     );
@@ -107,7 +107,6 @@ class HistoricPortfolios with ChangeNotifier {
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData != null) {
       extractedData.forEach((portfolioId, portfolioData) {
-        var test = portfolioData['stocks'][0]['portfolioId'];
         final tempStocksObj = Stocks(portfolioData['stocks'][0]['portfolioId']);
         tempStocksObj.stocks = (portfolioData['stocks'] as List<dynamic>)
             .map((stock) => Stock(

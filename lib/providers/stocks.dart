@@ -1,4 +1,6 @@
-import 'package:uuid/uuid.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 import '../models/stock.dart';
 
@@ -7,41 +9,6 @@ class Stocks {
   final portfolioId;
 
   Stocks(this.portfolioId);
-
-  // List<Stock> _stocks = [
-  //   Stock(
-  //     id: Uuid().v1(),
-  //     name: 'Google',
-  //     ticker: 'GOOG',
-  //     price: 2224.63,
-  //     quantity: 1,
-  //     portfolioId: Uuid().v1(),
-  //   ),
-  //   Stock(
-  //     id: Uuid().v1(),
-  //     name: 'Microsoft',
-  //     ticker: 'MSFT',
-  //     price: 258.24,
-  //     quantity: 2,
-  //     portfolioId: Uuid().v1(),
-  //   ),
-  //   Stock(
-  //     id: Uuid().v1(),
-  //     name: 'Facebook',
-  //     ticker: 'FB',
-  //     price: 301.55,
-  //     quantity: 1,
-  //     portfolioId: Uuid().v1(),
-  //   ),
-  //   Stock(
-  //     id: Uuid().v1(),
-  //     name: 'Apple',
-  //     ticker: 'AAPl',
-  //     price: 130.2,
-  //     quantity: 1,
-  //     portfolioId: Uuid().v1(),
-  //   ),
-  // ];
 
   List<Stock> _stocks = [];
 
@@ -78,14 +45,55 @@ class Stocks {
   }
 
   //add a stock in the list
-  void addStock(Stock stock) {
+  Future<void> addStock(Stock stock) async {
     _stocks.add(stock);
+    final response = await http.patch(
+      Uri.parse(
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/${_stocks.length - 1}.json'),
+      body: json.encode(
+        {
+          'id': stock.id,
+          'name': stock.name,
+          'ticker': stock.ticker,
+          'price': stock.price,
+          'quantity': stock.quantity,
+          'portfolioId': stock.portfolioId,
+        },
+      ),
+    );
+    if (response.statusCode >= 400) {
+      _stocks.remove(stock); //means the add failed so remove it
+    }
   }
 
   //removes a stock
-  void removeStock(String id) {
+  Future<void> removeStock(String id) async {
     int stockIndex = _stocks.indexWhere((stock) => stock.id == id);
-    _stocks.removeAt(stockIndex);
+    Stock stock = _stocks.removeAt(stockIndex);
+    var response = await http.delete(
+      Uri.parse(
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/$stockIndex.json'),
+    );
+    if (response.statusCode >= 400) {
+      _stocks.insert(stockIndex, stock); //add it back in if it failed
+    }
+    response = await http.patch(
+      Uri.parse(
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId.json'),
+      body: json.encode({
+        'stocks': _stocks
+            .map((stock) => {
+                  'id': stock.id,
+                  'name': stock.name,
+                  'ticker': stock.ticker,
+                  'price': stock.price,
+                  'quantity': stock.quantity,
+                  'portfolioId': stock.portfolioId,
+                  'currentPrice': stock.currentPrice,
+                })
+            .toList(),
+      }),
+    );
   }
 
   //method so we can do request for the prices with a delay
