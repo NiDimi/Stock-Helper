@@ -61,6 +61,10 @@ class _AddStockScreenState extends State<AddStockScreen> {
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
+                setState(() {
+                  _isLoading = false;
+                });
+
                 Navigator.of(context).pop();
               },
               child: Text('Okay'),

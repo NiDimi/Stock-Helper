@@ -5,8 +5,13 @@ import 'package:http/http.dart' as http;
 import '../models/stock.dart';
 import './stocks.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiRequests with ChangeNotifier {
+  DateTime _nextRequestTimer;
+  static const KEY = 'timer';
+  static const TIMEOUT_HOUR = 1;
+
   final yahooHeaders = {
     'x-rapidapi-key': 'c240089657mshdadc79016c189a9p16df26jsnc6431c2dd55f',
     'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
@@ -22,7 +27,7 @@ class ApiRequests with ChangeNotifier {
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
 
-    if (!stocksData.readyForRequest()) {
+    if (await readyForRequest()) {
       //we only want to allow request after a certain time
       return;
     }
@@ -130,5 +135,29 @@ class ApiRequests with ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  //method so we can do request for the prices with a delay
+  Future<bool> readyForRequest() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (_nextRequestTimer == null) {
+      final stringTimer = prefs.getString(KEY);
+      if (stringTimer == null) {
+        _nextRequestTimer = DateTime.now().add(Duration(hours: TIMEOUT_HOUR));
+        prefs.setString(KEY, _nextRequestTimer.toIso8601String());
+        return true;
+      }
+      if(DateTime.parse(stringTimer).isBefore(DateTime.now())){
+        _nextRequestTimer = DateTime.now().add(Duration(hours: TIMEOUT_HOUR));
+        prefs.setString(KEY, _nextRequestTimer.toIso8601String());
+        return true;
+      }
+      return false;
+    }
+    if (_nextRequestTimer.isBefore(DateTime.now())) {
+      _nextRequestTimer = DateTime.now().add(Duration(hours: TIMEOUT_HOUR));
+      return true;
+    }
+    return false;
   }
 }

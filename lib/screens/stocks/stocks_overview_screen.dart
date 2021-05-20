@@ -141,7 +141,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
         if (stock != null) {
           setState(
             () {
-              _stocksData.addStock(stock);
+              _stocksData.addPortfolioStock(stock);
               // _refreshStocks(context);
             },
           );

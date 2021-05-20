@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import '../models/stock.dart';
 
 class Stocks {
-  DateTime _nextRequestTimer;
   final portfolioId;
 
   Stocks(this.portfolioId);
@@ -45,7 +44,7 @@ class Stocks {
   }
 
   //add a stock in the list
-  Future<void> addStock(Stock stock) async {
+  Future<void> addPortfolioStock(Stock stock) async {
     _stocks.add(stock);
     final response = await http.patch(
       Uri.parse(
@@ -64,6 +63,10 @@ class Stocks {
     if (response.statusCode >= 400) {
       _stocks.remove(stock); //means the add failed so remove it
     }
+  }
+
+  void addHistoricStock(Stock stock){
+    _stocks.add(stock);
   }
 
   //removes a stock
@@ -94,18 +97,5 @@ class Stocks {
             .toList(),
       }),
     );
-  }
-
-  //method so we can do request for the prices with a delay
-  bool readyForRequest() {
-    if (_nextRequestTimer == null) {
-      _nextRequestTimer = DateTime.now().add(Duration(minutes: 10));
-      return true;
-    }
-    if (_nextRequestTimer.isBefore(DateTime.now())) {
-      _nextRequestTimer = DateTime.now().add(Duration(minutes: 10));
-      return true;
-    }
-    return false;
   }
 }
