@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import './stocks.dart';
 import '../providers/portfolios.dart';
@@ -11,17 +10,7 @@ import '../models/stock.dart';
 class HistoricPortfolios with ChangeNotifier {
   // list with all the portfolios
   static List<Portfolio> _portfolios = [];
-  double _revenue;
-  static const KEY = 'revenue';
-
-  HistoricPortfolios() {
-    SharedPreferences.getInstance().then((prefs) {
-      _revenue = prefs.getDouble(KEY);
-      if (_revenue == null) {
-        _revenue = 0.0;
-      }
-    });
-  }
+  double _profit = 0.0;
 
   List<Portfolio> get portfolios {
     return [..._portfolios];
@@ -30,8 +19,8 @@ class HistoricPortfolios with ChangeNotifier {
   //close a stock and added into the historic data
   Future<void> addHistoricTransaction(Stock stock) async {
     //add the revenue of the stock to the final one
-    _revenue += (stock.currentPrice - stock.price) * stock.quantity;
-    storeRevenue();
+    _profit += (stock.currentPrice - stock.price) * stock.quantity;
+    _storeProfit();
     //we need to check if we exceeded the 10 porfolios limit
     checkForTenPortfolio();
     //we need to check if we already have a portfolio that the stock belongs too
@@ -106,7 +95,7 @@ class HistoricPortfolios with ChangeNotifier {
     if (_portfolios.length >= 10) {
       final response = await http.delete(Uri.parse(
           'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[0].id}.json'));
-      if(response.statusCode >= 400){
+      if (response.statusCode >= 400) {
         return;
       }
       _portfolios.removeAt(0);
@@ -115,13 +104,18 @@ class HistoricPortfolios with ChangeNotifier {
 
   //gets the revenue of all the portfolios
   double getRevenue() {
-    return _revenue;
+    return _profit;
   }
 
   //stores the revenue into memory
-  Future<void> storeRevenue() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setDouble(KEY, _revenue);
+  Future<void> _storeProfit() async {
+    final response = await http.patch(
+        Uri.parse(
+            'https://stockity-4ae33-default-rtdb.firebaseio.com/.json'),
+        body: json.encode({'profit': _profit}));
+    if (response.statusCode >= 400) {
+      return;
+    }
   }
 
   //fetches and sets the historic transactions from firebase
@@ -157,5 +151,18 @@ class HistoricPortfolios with ChangeNotifier {
         );
       });
     }
+    fetchProfit();
+  }
+
+  Future<void> fetchProfit() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/profit.json'),
+    );
+    if (response.statusCode >= 400) {
+      _profit = 0.0;
+      return;
+    }
+   _profit = double.parse(response.body);
   }
 }
