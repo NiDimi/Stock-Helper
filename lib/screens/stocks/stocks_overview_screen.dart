@@ -60,7 +60,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
 
   void _removeStock(String id) {
     setState(() {
-      _stocksData.removeStock(id);
+      _stocksData.removeStock(id, Provider.of<Portfolios>(context, listen: false).authToken);
     });
   }
 
@@ -141,7 +141,7 @@ class _StocksOverviewScreenState extends State<StocksOverviewScreen> {
         if (stock != null) {
           setState(
             () {
-              _stocksData.addPortfolioStock(stock);
+              _stocksData.addPortfolioStock(stock, Provider.of<Portfolios>(context, listen: false).authToken);
               // _refreshStocks(context);
             },
           );

@@ -11,6 +11,11 @@ class HistoricPortfolios with ChangeNotifier {
   // list with all the portfolios
   static List<Portfolio> _portfolios = [];
   double _profit = 0.0;
+  final String authToken;
+  final String userId;
+
+
+  HistoricPortfolios(this.authToken, this.userId);
 
   List<Portfolio> get portfolios {
     return [..._portfolios];
@@ -38,7 +43,7 @@ class HistoricPortfolios with ChangeNotifier {
   Future<void> _addExistingPortfolio(int index, Stock stock) async {
     final response = await http.patch(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[index].id}/stocks/${_portfolios[index].portfolioStocks.stocks.length}.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[index].id}/stocks/${_portfolios[index].portfolioStocks.stocks.length}.json?auth=$authToken'),
       body: json.encode({
         'id': stock.id,
         'name': stock.name,
@@ -47,6 +52,7 @@ class HistoricPortfolios with ChangeNotifier {
         'quantity': stock.quantity,
         'portfolioId': stock.portfolioId,
         'currentPrice': stock.currentPrice,
+        'creatorId' : userId,
       }),
     );
 
@@ -59,16 +65,17 @@ class HistoricPortfolios with ChangeNotifier {
 
   //generates a new portfolio since we closed a new portfolio
   Future<void> _addNewPortfolio(Stock stock) async {
-    String name = Portfolios()
+    String name = Portfolios(null, null)
         .portfolios
         .firstWhere((portfolio) => portfolio.id == stock.portfolioId)
         .name;
 
     final response = await http.post(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json?auth=$authToken'),
       body: json.encode({
         'name': name,
+        'creatorId' : userId,
         'stocks': {
           '0': {
             'id': stock.id,
@@ -94,7 +101,7 @@ class HistoricPortfolios with ChangeNotifier {
   void checkForTenPortfolio() async {
     if (_portfolios.length >= 10) {
       final response = await http.delete(Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[0].id}.json'));
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/history/${_portfolios[0].id}.json?auth=$authToken'));
       if (response.statusCode >= 400) {
         return;
       }
@@ -110,8 +117,7 @@ class HistoricPortfolios with ChangeNotifier {
   //stores the revenue into memory
   Future<void> _storeProfit() async {
     final response = await http.patch(
-        Uri.parse(
-            'https://stockity-4ae33-default-rtdb.firebaseio.com/.json'),
+        Uri.parse('https://stockity-4ae33-default-rtdb.firebaseio.com/.json?auth=$authToken'),
         body: json.encode({'profit': _profit}));
     if (response.statusCode >= 400) {
       return;
@@ -122,7 +128,7 @@ class HistoricPortfolios with ChangeNotifier {
   Future<void> fetchAndSetHistoricData() async {
     final response = await http.get(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/history.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"'),
     );
     if (response.statusCode >= 400) {
       return;
@@ -157,12 +163,16 @@ class HistoricPortfolios with ChangeNotifier {
   Future<void> fetchProfit() async {
     final response = await http.get(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/profit.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/profit.json?auth=$authToken'),
     );
     if (response.statusCode >= 400) {
       _profit = 0.0;
       return;
     }
-   _profit = double.parse(response.body);
+    if(response.body == 'null'){
+      _profit =0.0;
+      return;
+    }
+    _profit = double.parse(response.body);
   }
 }

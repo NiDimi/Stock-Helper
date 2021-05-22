@@ -27,7 +27,7 @@ class ApiRequests with ChangeNotifier {
     //twelve api has 12 calls per min and 850 per day
     //yahoo has 500 per month
 
-    if (await readyForRequest()) {
+    if (!await readyForRequest()) {
       //we only want to allow request after a certain time
       return;
     }

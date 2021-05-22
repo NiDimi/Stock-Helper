@@ -44,11 +44,11 @@ class Stocks {
   }
 
   //add a stock in the list
-  Future<void> addPortfolioStock(Stock stock) async {
+  Future<void> addPortfolioStock(Stock stock, String authToken) async {
     _stocks.add(stock);
     final response = await http.patch(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/${_stocks.length - 1}.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/${_stocks.length - 1}.json?auth=$authToken'),
       body: json.encode(
         {
           'id': stock.id,
@@ -57,6 +57,7 @@ class Stocks {
           'price': stock.price,
           'quantity': stock.quantity,
           'portfolioId': stock.portfolioId,
+          'currentPrice': stock.currentPrice,
         },
       ),
     );
@@ -65,17 +66,17 @@ class Stocks {
     }
   }
 
-  void addHistoricStock(Stock stock){
+  void addHistoricStock(Stock stock) {
     _stocks.add(stock);
   }
 
   //removes a stock
-  Future<void> removeStock(String id) async {
+  Future<void> removeStock(String id, String authToken) async {
     int stockIndex = _stocks.indexWhere((stock) => stock.id == id);
     Stock stock = _stocks.removeAt(stockIndex);
     var response = await http.delete(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/$stockIndex.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId/stocks/$stockIndex.json?auth=$authToken'),
     );
     if (response.statusCode >= 400) {
       _stocks.insert(stockIndex, stock); //add it back in if it failed
