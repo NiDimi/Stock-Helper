@@ -1,18 +1,44 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stock_helper/providers/auth.dart';
+import 'package:stock_helper/providers/portfolios.dart';
 import 'package:stock_helper/widgets/auth/auth_card.dart';
 
 enum AuthMode { Signup, Login }
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   static const routeName = '/auth';
+
+  @override
+  _AuthScreenState createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+
+  var _isLoading = true;
+  var _isInit = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if(_isInit) {
+      Provider.of<Auth>(context, listen: false).quickSignIn().then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+      _isInit = false;
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      body: Stack(
+      body: _isLoading ? Center(child: CircularProgressIndicator(),) :Stack(
         children: <Widget>[
           Container(
             decoration: BoxDecoration(

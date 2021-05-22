@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stock_helper/providers/auth.dart';
+import 'package:stock_helper/screens/auth/auth_screen.dart';
 import '../screens/portfolios/portfolio_screen.dart';
 import '../screens/history/history_screen.dart';
 
@@ -62,7 +65,10 @@ class AppDrawer extends StatelessWidget {
                 'Logout',
                 style: textStyle,
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).pop();
+                Provider.of<Auth>(context, listen: false).logout();
+              },
             ),
           ],
         ),

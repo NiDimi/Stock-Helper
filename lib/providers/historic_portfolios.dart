@@ -116,8 +116,8 @@ class HistoricPortfolios with ChangeNotifier {
 
   //stores the revenue into memory
   Future<void> _storeProfit() async {
-    final response = await http.patch(
-        Uri.parse('https://stockity-4ae33-default-rtdb.firebaseio.com/.json?auth=$authToken'),
+    final response = await http.put(
+        Uri.parse('https://stockity-4ae33-default-rtdb.firebaseio.com/profit/$userId.json?auth=$authToken'),
         body: json.encode({'profit': _profit}));
     if (response.statusCode >= 400) {
       return;
@@ -163,7 +163,7 @@ class HistoricPortfolios with ChangeNotifier {
   Future<void> fetchProfit() async {
     final response = await http.get(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/profit.json?auth=$authToken'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/profit/$userId/profit.json?auth=$authToken'),
     );
     if (response.statusCode >= 400) {
       _profit = 0.0;
