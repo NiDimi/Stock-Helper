@@ -175,4 +175,8 @@ class HistoricPortfolios with ChangeNotifier {
     }
     _profit = double.parse(response.body);
   }
+
+  void logout(){
+    _portfolios = [];
+  }
 }

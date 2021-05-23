@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../../models/portfolio.dart';
 import '../revenue_widget.dart';
@@ -37,8 +39,13 @@ class _HistoryItemState extends State<HistoryItem> {
 
   //widget someone when the user expands
   Widget expandedData() {
-    return Container(
-      height: 150,
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+      height: _expanded
+          ? min(
+              widget._portfolio.portfolioStocks.stocks.length * 30.0 + 10, 150)
+          : 0,
       child: ListView(
         children: widget._portfolio.portfolioStocks.stocks
             .map(
@@ -49,7 +56,8 @@ class _HistoryItemState extends State<HistoryItem> {
                   children: <Widget>[
                     Text(stock.name),
                     Text(
-                      ((stock.currentPrice - stock.price) * stock.quantity).toStringAsFixed(2),
+                      ((stock.currentPrice - stock.price) * stock.quantity)
+                          .toStringAsFixed(2),
                     ),
                   ],
                 ),
@@ -62,19 +70,26 @@ class _HistoryItemState extends State<HistoryItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      color: Theme.of(context).primaryColor,
-      margin: const EdgeInsets.all(10),
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          children: <Widget>[
-            mainTile(),
-            if (_expanded) expandedData(),
-          ],
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      height: _expanded
+          ? min(
+              widget._portfolio.portfolioStocks.stocks.length * 30.0 + 120, 260)
+          : 110,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        color: Theme.of(context).primaryColor,
+        margin: const EdgeInsets.all(10),
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            children: <Widget>[
+              mainTile(),
+              expandedData(),
+            ],
+          ),
         ),
       ),
     );

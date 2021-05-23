@@ -27,14 +27,16 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProxyProvider<Auth, Portfolios>(
           create: (_) => Portfolios(null, null),
-          update: (context, auth, previous) => Portfolios(auth.token, auth.userId),
+          update: (context, auth, previous) =>
+              Portfolios(auth.token, auth.userId),
         ),
         ChangeNotifierProvider(
           create: (_) => ApiRequests(),
         ),
         ChangeNotifierProxyProvider<Auth, HistoricPortfolios>(
           create: (_) => HistoricPortfolios(null, null),
-          update: (context, auth, previous) => HistoricPortfolios(auth.token, auth.userId),
+          update: (context, auth, previous) =>
+              HistoricPortfolios(auth.token, auth.userId),
         ),
       ],
       child: Consumer<Auth>(
@@ -81,6 +83,7 @@ class _MyAppState extends State<MyApp> {
             StocksOverviewScreen.routeName: (_) => StocksOverviewScreen(),
             AddStockScreen.routeName: (_) => AddStockScreen(),
             HistoryScreen.routeName: (_) => HistoryScreen(),
+            AuthScreen.routeName: (_) => AuthScreen(),
           },
         ),
       ),

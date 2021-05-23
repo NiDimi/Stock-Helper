@@ -122,4 +122,8 @@ class Portfolios with ChangeNotifier {
       });
     }
   }
+
+  void logout(){
+    _portfolios = [];
+  }
 }

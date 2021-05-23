@@ -83,7 +83,7 @@ class Stocks {
     }
     response = await http.patch(
       Uri.parse(
-          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId.json'),
+          'https://stockity-4ae33-default-rtdb.firebaseio.com/portfolios/$portfolioId.json?auth=$authToken'),
       body: json.encode({
         'stocks': _stocks
             .map((stock) => {

@@ -89,6 +89,8 @@ class Auth with ChangeNotifier {
     _token = null;
     _userId = null;
     _expiryDate = null;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(KEY, '');
     notifyListeners();
   }
 
@@ -96,7 +98,7 @@ class Auth with ChangeNotifier {
     if(!alreadySingedIn) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var userData = prefs.get(KEY);
-      if (userData == null) {
+      if (userData == null || userData == '') {
         return;
       }
       var test = json.decode(userData);
