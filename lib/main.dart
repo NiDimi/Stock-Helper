@@ -9,6 +9,7 @@ import './providers/api_requests.dart';
 import './providers/portfolios.dart';
 import './screens/portfolios/portfolio_screen.dart';
 import './screens/stocks/stocks_overview_screen.dart';
+import 'helpers/custom_routes.dart';
 
 void main() => runApp(MyApp());
 
@@ -52,6 +53,10 @@ class _MyAppState extends State<MyApp> {
               elevation: 5.0,
             ),
             fontFamily: 'Lato',
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android : CustomPageTransitionBuilder(),
+              TargetPlatform.iOS : CustomPageTransitionBuilder(),
+            }),
             textTheme: ThemeData.light().textTheme.copyWith(
                   headline1: TextStyle(
                     fontSize: 20,
