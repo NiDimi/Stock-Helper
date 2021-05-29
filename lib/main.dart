@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
                       color: Color.fromARGB(255, 210, 210, 210), fontSize: 18),
                 ),
           ),
-          home: auth.isAuth ? PortfolioScreen() : AuthScreen(),
+          home: AuthScreen(),
           routes: {
             PortfolioScreen.routeName: (_) => PortfolioScreen(),
             StocksOverviewScreen.routeName: (_) => StocksOverviewScreen(),

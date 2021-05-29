@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_helper/providers/auth.dart';
 import 'package:stock_helper/providers/portfolios.dart';
+import 'package:stock_helper/screens/portfolios/portfolio_screen.dart';
 import 'package:stock_helper/widgets/auth/auth_card.dart';
 
 enum AuthMode { Signup, Login }
@@ -27,6 +28,9 @@ class _AuthScreenState extends State<AuthScreen> {
       Provider.of<Auth>(context, listen: false).quickSignIn().then((value) {
         setState(() {
           _isLoading = false;
+          if(value == true){
+            Navigator.of(context).pushReplacementNamed(PortfolioScreen.routeName);
+          }
         });
       });
       _isInit = false;

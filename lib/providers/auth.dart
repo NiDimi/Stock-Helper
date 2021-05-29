@@ -94,16 +94,17 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> quickSignIn() async {
+  Future<bool> quickSignIn() async {
     if(!alreadySingedIn) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var userData = prefs.get(KEY);
       if (userData == null || userData == '') {
-        return;
+        return false;
       }
       var test = json.decode(userData);
       await login(test['email'], test['password']);
       alreadySingedIn = true;
+      return true;
     }
   }
 }
