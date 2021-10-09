@@ -13,12 +13,12 @@ class ApiRequests with ChangeNotifier {
   static const TIMEOUT_HOUR = 1;
 
   final yahooHeaders = {
-    'x-rapidapi-key': 'c240089657mshdadc79016c189a9p16df26jsnc6431c2dd55f',
+    'x-rapidapi-key': 'YOUR KEY HERE',
     'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
   };
 
   final twelveHeaders = {
-    'x-rapidapi-key': 'c240089657mshdadc79016c189a9p16df26jsnc6431c2dd55f',
+    'x-rapidapi-key': 'YOUR KEY HERE',
     'x-rapidapi-host': 'twelve-data1.p.rapidapi.com'
   };
 
