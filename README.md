@@ -19,7 +19,7 @@ The app has a feature that allows auto-login, this means that once you log in yo
 again, until you click logout. The security for this feature is not ideal though but since 
 the app was never meant for commercial use its okay.</li>
 
-<li><h3> Portfoclio </h3>
+<li><h3> Portfolio </h3>
 
 <img  src="./ui_images/portfolios.jpg">
 <img  src="./ui_images/adding_portfolios.jpg">
